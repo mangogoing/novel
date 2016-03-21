@@ -1,0 +1,125 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dialog_more"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/ll_prompt"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_item_hight"
+        android:clickable="true"
+        android:orientation="vertical"
+        android:weightSum="3" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="59dp"
+            android:clickable="false"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:gravity="center"
+                android:text="您未收藏该小说，是否收藏"
+                android:textColor="@color/white"
+                android:textSize="25sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:background="@drawable/dividing_line"
+                android:clickable="false" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_collect"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_item_hight"
+        android:clickable="true"
+        android:orientation="vertical"
+        android:weightSum="3" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="59dp"
+            android:clickable="false"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:contentDescription="@string/collect_button"
+                android:gravity="center"
+                android:text="@string/collect"
+                android:textColor="@color/white"
+                android:textSize="25sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:background="@drawable/dividing_line"
+                android:clickable="false" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_item_hight"
+        android:clickable="true"
+        android:orientation="vertical"
+        android:weightSum="3" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="59dp"
+            android:clickable="false"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:contentDescription="@string/cancel_button"
+                android:gravity="center"
+                android:text="@string/cancel"
+                android:textColor="@color/white"
+                android:textSize="25sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:background="@drawable/dividing_line"
+                android:clickable="false" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

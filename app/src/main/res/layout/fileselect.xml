@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/mPath"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_item_hight"
+        android:gravity="center"
+        android:text="存储目录"
+        android:visibility="gone"
+        android:textSize="25dp" >
+    </TextView>
+
+    <ListView
+        android:id="@+id/lv_file_select"
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent" >
+    </ListView>
+
+</LinearLayout>

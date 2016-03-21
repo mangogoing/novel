@@ -1,0 +1,140 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/tv_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="正在请求内容，请稍后"
+        android:textColor="@color/white"
+        android:textSize="25sp"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tv_introduct"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:layout_weight="1"
+        android:padding="10dp"
+        android:text="加载中,若长时间没有获取到数据，请检查网络"
+        android:textColor="@color/white"
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/tv_progress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:ellipsize="end"
+        android:paddingLeft="10dp"
+        android:text="准备缓存0%"
+        android:textColor="@color/black"
+        android:textSize="25sp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/activity_item_hight"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/tv_collect"
+                android:layout_width="fill_parent"
+                android:layout_height="59dp"
+                android:contentDescription="@string/collect_button"
+                android:gravity="center"
+                android:paddingLeft="17dp"
+                android:text="@string/collect"
+                android:textColor="@android:color/white"
+                android:textSize="25sp" >
+            </TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="17dp"
+                    android:background="@drawable/parting_line"
+                    android:clickable="false" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/activity_item_hight"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/tv_downLoad"
+                android:layout_width="fill_parent"
+                android:layout_height="59dp"
+                android:contentDescription="@string/downLoad_button"
+                android:gravity="center"
+                android:paddingLeft="17dp"
+                android:text="@string/downLoad"
+                android:textColor="@android:color/white"
+                android:textSize="25sp" >
+            </TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="17dp"
+                    android:background="@drawable/parting_line"
+                    android:clickable="false" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/activity_item_hight"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/tv_read"
+                android:layout_width="fill_parent"
+                android:layout_height="59dp"
+                android:contentDescription="@string/read_button"
+                android:gravity="center"
+                android:paddingLeft="17dp"
+                android:text="@string/read"
+                android:textColor="@android:color/white"
+                android:textSize="25sp" >
+            </TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="17dp"
+                    android:background="@drawable/parting_line"
+                    android:clickable="false" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

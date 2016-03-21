@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<resources>
+
+    <string name="app_name">小说阅读</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="read">阅读</string>
+    <string name="downLoad">缓存</string>
+    <string name="catalog">目录</string>
+    <string name="more">更多</string>
+    <string name="collect">收藏</string>
+    <string name="pre_chapter">上一章</string>
+    <string name="replace_resources">换源</string>
+    <string name="pause_or_play">暂停</string>
+    <string name="next_chapter">下一章</string>
+    <string name="read_button">阅读。按钮</string>
+    <string name="downLoad_button">缓存。按钮</string>
+    <string name="catalog_button">目录。按钮</string>
+    <string name="more_button">更多。按钮</string>
+    <string name="collect_button">收藏。按钮</string>
+    <string name="pre_chapter_button">上一章。按钮</string>
+    <string name="replace_resources_button">换源。按钮</string>
+    <string name="pause_or_play_button">暂停。按钮</string>
+    <string name="next_chapter_button">下一章。按钮</string>
+    <string name="input_page">输入页码</string>
+    <string name="goto_chapter">跳转</string>
+    <string name="goto_chapter_button">跳转。按钮</string>
+    <string name="search">搜索</string>
+    <string name="search_button">搜索.按钮</string>
+    <string name="prompt">提示</string>
+    <string name="prompt_button">提示.按钮</string>
+    <string name="cancel">取消</string>
+    <string name="cancel_button">取消.按钮</string>
+    <string name="disclaimer_text"> \n&#160;&#160;&#160;&#160;小说阅读提醒您：在使用小说阅读前,请您务必仔细阅读并透彻理解本声明。您可以选择不使用小说阅读,但如果您使用小说阅读,您的使用行为将被视为对本声明全部内容的认可。
+          \n&#160;&#160;&#160;&#160;   小说阅读是一款提供网络小说及时更新的工具,为广大爱好者提供一种方便、快捷、舒适的试读体验。小说阅读致力于最大程度的减少网络小说阅读者在自行搜索过程中毫无意义的时间浪费,通过专业搜索展示不同网站中网络小说
+          的最新章节。小说阅读为广大小说爱好者提供方便、快捷、舒适的试读体验的同时,也使优秀网络小说得以更加迅捷、更广泛的传播,从而达到了在一定程度促进网络文字充分繁荣发展之目的。
+          \n&#160;&#160;&#160;&#160;   当您点击搜索一本书时,小说阅读会将该书的书名以关键词的形式提交到第三方网站或搜索引擎（如百度、宜搜、贴吧等）。第三方网站返回的内容与小说阅读无关,小说阅读对其概不负责,亦不承担任何法律责任。
+          任何通过使用小说阅读而链接到的第三方网站均系他人制作或提供,您可能从该第三方网页上获取其他服务,小说阅读对其合法性概不负责,亦不承担任何法律责任。第三方搜索引擎结果根据您的提交署名自动搜索获取并提供试读,不代表小说阅读
+          赞成被搜索链接到的第三方网页上的内容和立场。您应该对使用搜索引擎的结果自行承担风险。小说阅读不做任何形式的保证：不保证第三方搜索引擎的搜索结果满足您的要求,不保证搜索服务不中断,不保证搜索结果的安全性、正确性
+          、及时性、合法性。因网络状况、通讯线路、第三方网站等任何原因导致您不能正常使用小说阅读,小说阅读不承担任何法律责任。小说阅读尊重并保护所有使用小说阅读的个人隐私权,您注册用户名、电子邮件地址等个人资料,非经您亲自许可
+          或根据相关法律、法规的强制性规定,小说阅读不会主动泄露给第三方。
+          \n&#160;&#160;&#160;&#160;    小说阅读鼓励广大小说爱好者通过小说阅读发现优秀网络小说极其提供商,并建议阅读正版图书。任何单位和个人认为通过小说阅读搜索链接到的第三方网页内容可能涉嫌侵犯其信息网络传播权,应该及时向小说阅读提出书面权利通知,并提供
+          身份证明、权属证明及详细侵权情况证明。小说阅读在收到上述法律文件后,将会依法尽快断开相关链接内容。\n</string>
+
+</resources>

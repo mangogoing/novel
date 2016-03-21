@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/load"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="正在请求内容，请稍后"
+        android:textColor="@color/white"
+        android:textSize="25sp"
+        />
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="fill_parent"
+        android:layout_height="427dp"
+        android:layout_weight="1.14"
+        android:background="@color/black" >
+    </android.support.v4.view.ViewPager>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="240dp"
+        android:background="@color/black"
+        android:orientation="vertical" >
+
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="@dimen/activity_item_hight"
+          android:orientation="vertical" >
+
+          <TextView
+              android:id="@+id/pause"
+              android:layout_width="fill_parent"
+              android:layout_height="59dp"
+              android:layout_gravity="right"
+              android:contentDescription="暂停。按钮"
+              android:gravity="center"
+              android:paddingLeft="17dp"
+              android:text="暂停"
+              android:textColor="@android:color/white"
+              android:textSize="25sp" >
+          </TextView>
+
+          <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical" >
+
+              <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="match_parent"
+                  android:layout_marginLeft="17dp"
+                  android:background="@drawable/parting_line"
+                  android:clickable="false" />
+          </LinearLayout>
+      </LinearLayout>
+      
+      
+  <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="@dimen/activity_item_hight"
+          android:orientation="vertical" >
+
+          <TextView
+              android:id="@+id/pre"
+              android:layout_width="fill_parent"
+              android:layout_height="59dp"
+              android:layout_gravity="right"
+             android:contentDescription="上一章。按钮"
+            android:gravity="center"
+            android:text="上一章"
+              android:paddingLeft="17dp"
+              android:textColor="@android:color/white"
+              android:textSize="25sp" >
+          </TextView>
+
+          <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical" >
+
+              <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="match_parent"
+                  android:layout_marginLeft="17dp"
+                  android:background="@drawable/parting_line"
+                  android:clickable="false" />
+          </LinearLayout>
+      </LinearLayout>
+      
+       <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="@dimen/activity_item_hight"
+          android:orientation="vertical" >
+
+          <TextView
+              android:id="@+id/next"
+              android:layout_width="fill_parent"
+              android:layout_height="59dp"
+              android:layout_gravity="right"
+              android:contentDescription="下一章。按钮"
+        	    android:gravity="center"
+         	   android:text="下一章"
+              android:paddingLeft="17dp"
+              android:textColor="@android:color/white"
+              android:textSize="25sp" >
+          </TextView>
+
+          <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical" >
+
+              <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="match_parent"
+                  android:layout_marginLeft="17dp"
+                  android:background="@drawable/parting_line"
+                  android:clickable="false" />
+          </LinearLayout>
+      </LinearLayout>
+
+          <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="@dimen/activity_item_hight"
+          android:orientation="vertical" >
+
+          <TextView
+              android:id="@+id/more"
+              android:layout_width="fill_parent"
+              android:layout_height="59dp"
+              android:layout_gravity="right"
+                android:contentDescription="更多。按钮"
+            android:gravity="center"
+            android:text="更多"
+              android:paddingLeft="17dp"
+              android:textColor="@android:color/white"
+              android:textSize="25sp" >
+          </TextView>
+
+          <LinearLayout
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical" >
+
+              <TextView
+                  android:layout_width="wrap_content"
+                  android:layout_height="match_parent"
+                  android:layout_marginLeft="17dp"
+                  android:background="@drawable/parting_line"
+                  android:clickable="false" />
+          </LinearLayout>
+      </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

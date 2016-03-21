@@ -1,0 +1,55 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_item_hight" >
+
+        <TextView
+            android:id="@+id/tv_search"
+            android:layout_width="@dimen/activity_item_hight"
+            android:layout_height="match_parent"
+            android:background="@color/black"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:text="@string/search"
+            android:contentDescription="@string/search_button"
+            android:textColor="@color/white" />
+
+        <AutoCompleteTextView
+            android:id="@+id/av_autotext"
+            android:layout_alignLeft="@id/tv_search"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_toLeftOf="@id/tv_search"
+            android:background="@color/edit_color"
+            android:hint="请输入您要搜索的内容"
+            android:paddingLeft="20dp"
+            android:textColor="@color/white" />
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/lv_search_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="true" >
+    </ListView>
+
+    <TextView
+        android:id="@+id/tv_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="true"
+        android:gravity="center"
+        android:text="搜索结果加载中，请稍等"
+        android:textColor="@color/white"
+        android:textSize="25sp"
+        android:visibility="gone" />
+
+</LinearLayout>

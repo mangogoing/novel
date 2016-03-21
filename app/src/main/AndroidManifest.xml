@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="net.tatans.coeus.novel" >
+
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
+    <!-- 读取电话状态权限 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.PROCESS_OUTGOING_CALLS" />
+    <!-- 添加WiFi以及访问网络的权限 -->
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.INTERNET" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.WAKE_LOCK" >
+    </uses-permission>
+    <!-- umeng权限 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" >
+    </uses-permission>
+    <!-- 在SDCard中创建与删除文件权限 -->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" />
+    <!-- 往SDCard写入数据权限 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- 往SDCard读取数据权限 -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <application
+        android:name="net.tatans.coeus.novel.app.App"
+        android:allowBackup="true"
+        android:icon="@drawable/launcher"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.NoTitleBar" >
+
+        <!-- umeng  appkey + channel -->
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="55dfc69367e58e6163004cda" />
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="tatansPublish" />
+
+        <activity
+            android:name="net.tatans.coeus.novel.activities.MainActivity"
+            android:exported="true"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <!-- 书籍 -->
+        <activity
+            android:name="net.tatans.coeus.novel.activities.RankListActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 简介 -->
+        <activity
+            android:name="net.tatans.coeus.novel.activities.BookBriefActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 排行榜 -->
+        <activity
+            android:name="net.tatans.coeus.novel.activities.RankActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 我的收藏 -->
+        <activity
+            android:name="net.tatans.coeus.novel.activities.CollectorActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 小说一级男生分类 -->
+        <activity
+            android:name="net.tatans.coeus.novel.activities.MaleAssortActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 小说一级女生分类 -->
+        <activity
+            android:name="net.tatans.coeus.novel.activities.FemaleAssortActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 小说二级分类 -->
+        <activity
+            android:name="net.tatans.coeus.novel.activities.BookListActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 主题界面 -->
+        <activity
+            android:name="net.tatans.coeus.novel.activities.ThemeMainActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 主题界面 -->
+        <activity
+            android:name="net.tatans.coeus.novel.activities.ThemeActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 主题 list界面 -->
+        <activity
+            android:name="net.tatans.coeus.novel.activities.ThemeListActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 小说目录 -->
+        <activity
+            android:name="net.tatans.coeus.novel.activities.ChapterListActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 小说播放 -->
+        <activity
+            android:name="net.tatans.coeus.novel.activities.NovelDisplayActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 搜索播放 -->
+        <activity
+            android:name="net.tatans.coeus.novel.activities.FuzzySearchActivity"
+            android:exported="true"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 资源列表 -->
+        <activity
+            android:name="net.tatans.coeus.novel.activities.ResourceListActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 换源列表 -->
+        <activity android:name="net.tatans.coeus.novel.activities.ReplaceResourceActivity" >
+        </activity>
+        <!-- 下载服务 -->
+        <service android:name="net.tatans.coeus.novel.services.DownLoadService" >
+        </service>
+        <!-- 播放服务 -->
+        <service android:name="net.tatans.coeus.novel.services.NovelDisolayService" >
+        </service>
+        <!-- 免责声明 -->
+        <activity
+            android:name="net.tatans.coeus.novel.activities.DisclaimerActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <!-- 更多界面 -->
+        <activity android:name="net.tatans.coeus.novel.activities.MoreActivity" />
+        <activity android:name="net.tatans.coeus.novel.activities.LocalFileActivity" />
+        <activity android:name="net.tatans.coeus.novel.activities.ScanActivity" />
+        <activity android:name="net.tatans.coeus.novel.activities.MyFileManager" />
+        <activity android:name="net.tatans.coeus.novel.activities.ContentActivity" />
+        <activity android:name="net.tatans.coeus.novel.activities.PromptActivity" />
+        <!-- 缓存完成广播接受器 -->
+        <receiver
+            android:name="net.tatans.coeus.novel.broadCastRecivers.DownLoadFinishReciver"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="net.tatans.coeus.novel.DownLoadService.finish" />
+            </intent-filter>
+        </receiver>
+
+        <!--
+   		         桌面手势广播接受器
+        <receiver
+            android:name="net.tatans.coeus.novel.GestureBroadcastReceiver"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="net.tatans.rhea.launcher.novel" />
+            </intent-filter>
+        </receiver>
+
+
+        -->
+    </application>
+
+</manifest>

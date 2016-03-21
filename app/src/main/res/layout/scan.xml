@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/tv_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="导入本地小说"
+        android:visibility="visible" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_item_hight"
+        android:gravity="center"
+        android:visibility="gone"
+        android:text="导入本地小说" />
+
+    <ListView
+        android:id="@+id/lv_scan"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="6" >
+    </ListView>
+
+</LinearLayout>

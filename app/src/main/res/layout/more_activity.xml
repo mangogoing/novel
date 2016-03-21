@@ -1,0 +1,207 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dialog_more"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_item_hight" >
+
+        <LinearLayout
+            android:id="@+id/ll_goto"
+            android:layout_width="@dimen/activity_item_hight"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginLeft="5dp"
+                android:background="@drawable/jump_to"
+                android:contentDescription="@string/goto_chapter_button"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="25sp" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/input_chapter"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toLeftOf="@id/ll_goto"
+            android:background="@color/edit_color"
+            android:hint="@string/input_page"
+            android:numeric="integer"
+            android:paddingLeft="20dp"
+            android:textColor="@color/white"
+            android:textSize="25sp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_catalog"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_item_hight"
+        android:clickable="true"
+        android:orientation="vertical"
+        android:weightSum="3" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="59dp"
+            android:clickable="false"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:layout_weight="3"
+                android:contentDescription="@string/catalog_button"
+                android:text="@string/catalog"
+                android:textColor="@color/white"
+                android:textSize="25sp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:clickable="false"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="38dp"
+                    android:background="@drawable/goto_chapter"
+                    android:gravity="right" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:background="@drawable/dividing_line"
+                android:clickable="false" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_cache"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_item_hight"
+        android:clickable="true"
+        android:orientation="vertical"
+        android:weightSum="3" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="59dp"
+            android:clickable="false"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:layout_weight="3"
+                android:contentDescription="@string/downLoad_button"
+                android:text="@string/downLoad"
+                android:textColor="@color/white"
+                android:textSize="25sp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:clickable="false"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="38dp"
+                    android:background="@drawable/goto_chapter"
+                    android:gravity="right" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:background="@drawable/dividing_line"
+                android:clickable="false" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_replace_resource"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/activity_item_hight"
+        android:clickable="true"
+        android:orientation="vertical"
+        android:weightSum="3" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="59dp"
+            android:clickable="false"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:layout_weight="3"
+                android:contentDescription="@string/replace_resources_button"
+                android:text="@string/replace_resources"
+                android:textColor="@color/white"
+                android:textSize="25sp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:clickable="false"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="38dp"
+                    android:background="@drawable/goto_chapter"
+                    android:gravity="right" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:background="@drawable/dividing_line"
+                android:clickable="false" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
