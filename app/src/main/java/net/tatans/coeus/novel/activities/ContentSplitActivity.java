@@ -131,7 +131,7 @@ public class ContentSplitActivity extends Activity {
 		next.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (AppContext.isNetworkAvailable(ContentSplitActivity.this)) {
+//				if (AppContext.isNetworkAvailable(ContentSplitActivity.this)) {
 					if (flag == 13) {
 						TatansToast.show( "正在加载中",
 								Toast.LENGTH_SHORT);
@@ -140,17 +140,18 @@ public class ContentSplitActivity extends Activity {
 						sentenceIndex = -1;
 						nextInformation();
 					}
-				} else {
-					TatansToast.show(
-							"当前网络不可用，请检查网络设置", Toast.LENGTH_SHORT);
-				}
+//				}
+//				else {
+//					TatansToast.show(
+//							"当前网络不可用，请检查网络设置", Toast.LENGTH_SHORT);
+//				}
 			}
 		});
 
 		pre.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (AppContext.isNetworkAvailable(ContentSplitActivity.this)) {
+//				if (AppContext.isNetworkAvailable(ContentSplitActivity.this)) {
 					if (flag == 13) {
 						TatansToast.show( "正在加载中",
 								Toast.LENGTH_SHORT);
@@ -159,10 +160,11 @@ public class ContentSplitActivity extends Activity {
 						sentenceIndex = -1;
 						preInformation();
 					}
-				} else {
-					TatansToast.show(
-							"当前网络不可用，请检查网络设置", Toast.LENGTH_SHORT);
-				}
+//				}
+//				else {
+//					TatansToast.show(
+//							"当前网络不可用，请检查网络设置", Toast.LENGTH_SHORT);
+//				}
 			}
 		});
 		pause_or_play.setOnClickListener(new OnClickListener() {

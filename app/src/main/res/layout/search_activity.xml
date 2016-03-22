@@ -21,7 +21,7 @@
             android:contentDescription="@string/search_button"
             android:textColor="@color/white" />
 
-        <AutoCompleteTextView
+        <EditText
             android:id="@+id/av_autotext"
             android:layout_alignLeft="@id/tv_search"
             android:layout_width="match_parent"
@@ -35,11 +35,20 @@
     </RelativeLayout>
 
     <ListView
-        android:id="@+id/lv_search_list"
+        android:id="@+id/lv_tips_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:focusable="true" >
     </ListView>
+
+    <ListView
+        android:id="@+id/lv_search_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        android:focusable="true" >
+    </ListView>
+
 
     <TextView
         android:id="@+id/tv_loading"

@@ -18,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -26,6 +27,7 @@ import net.tatans.coeus.network.tools.TatansHttp;
 import net.tatans.coeus.network.tools.TatansToast;
 import net.tatans.coeus.novel.R;
 import net.tatans.coeus.novel.adapter.BookListAdapter;
+import net.tatans.coeus.novel.adapter.TitleAdapter;
 import net.tatans.coeus.novel.base.BaseActivity;
 import net.tatans.coeus.novel.constant.AppConstants;
 import net.tatans.coeus.novel.dto.BookListDto;
@@ -43,21 +45,25 @@ public class FuzzySearchActivity extends BaseActivity implements
 		OnItemClickListener, OnClickListener, TextWatcher {
 	private List<String> searchList = new ArrayList<String>();
 	private ListView lv_search_list;
-	private BookListAdapter listAdapter;
-	private ArrayAdapter<String> emptyAdapter;
+	private ListView lv_tips_list;
+	private TitleAdapter listAdapter;
+	private BookListAdapter bookListAdapter;
+//	private ArrayAdapter<String> emptyAdapter;
 	private int pageCount;
 	private int currentPage = 1;
 	private List<BookListDto> ClassificatList = new ArrayList<BookListDto>();
 	private Handler handler = new Handler();
 	private Handler handlerSpeak = new Handler();
 	private Speaker speaker;
-	private AutoCompleteTextView av_autotext;
+	private EditText av_autotext;
 	private TextView tv_search;
 	private TextView tv_loading;
 	private boolean isSearch;// 判断是否为搜索
 	private ArrayAdapter<String> arrayAdapter;
 	private List<String> array = new ArrayList<String>();
 	private boolean isLoading;
+	private String inputText;
+	private boolean isOnItemClick;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -66,35 +72,50 @@ public class FuzzySearchActivity extends BaseActivity implements
 		setTitle("搜索");
 		speaker = Speaker.getInstance(FuzzySearchActivity.this);
 		initView();
-		emptyAdapter = new ArrayAdapter<String>(getApplication(),
-				R.layout.list_item, R.id.tv_item_name, new ArrayList<String>());
+//		emptyAdapter = new ArrayAdapter<String>(getApplication(),
+//				R.layout.list_item, R.id.tv_item_name, new ArrayList<String>());
 	}
 
 	@SuppressLint("NewApi")
 	private void initView() {
 		lv_search_list = (ListView) findViewById(R.id.lv_search_list);
 		lv_search_list.setOnItemClickListener(this);
-		av_autotext = (AutoCompleteTextView) findViewById(R.id.av_autotext);
-		av_autotext.setThreshold(1);
-		av_autotext.setWidth(480);
+		lv_tips_list = (ListView) findViewById(R.id.lv_tips_list);
+		lv_tips_list.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				String str = array.get(position);
+				Log.d("XXXXXXXXXXX", "" + str);
+				isOnItemClick = true;
+				av_autotext.setText(str);
+				av_autotext.setSelection(str.length());
+				inputText = str;
+				if (!isLoading) {
+					tv_loading.setVisibility(View.VISIBLE);
+					new searchAsycTesk().execute();
+				}
+			}
+		});
+		av_autotext = (EditText) findViewById(R.id.av_autotext);
+
 		av_autotext.addTextChangedListener(this);
 		tv_loading = (TextView) findViewById(R.id.tv_loading);
 		tv_search = (TextView) findViewById(R.id.tv_search);
 		tv_search.setOnClickListener(this);
-		av_autotext.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				Log.d("FuzzyActivity", "--->" + position);
-				removeListView(emptyAdapter);
-				if (!isLoading) {
-					new searchAsycTesk().execute();
-				}
-				InputMethodlUtil.hideInputMethod(FuzzySearchActivity.this,
-						av_autotext);
-			}
-		});
+//		av_autotext.setOnItemClickListener(new OnItemClickListener() {
+//
+//			@Override
+//			public void onItemClick(AdapterView<?> parent, View view,
+//					int position, long id) {
+//				Log.d("FuzzyActivity", "--->" + position);
+//				removeListView(emptyAdapter);
+//				if (!isLoading) {
+//					new searchAsycTesk().execute();
+//				}
+//				InputMethodlUtil.hideInputMethod(FuzzySearchActivity.this,
+//						av_autotext);
+//			}
+//		});
 
 		av_autotext.setOnHoverListener(new OnHoverListener() {
 
@@ -125,8 +146,14 @@ public class FuzzySearchActivity extends BaseActivity implements
 	@Override
 	public void onTextChanged(CharSequence s, int start, int before, int count) {
 		Log.d("FuzzySearchActivity", "onTextChanged--->" + s.toString());
-		new autoAsycTesk().execute();
-
+		inputText = av_autotext.getText().toString()
+				.replaceAll(" +", "");
+		if(!isOnItemClick){
+			handler.post(flushTextChangeUi1);
+			new autoAsycTesk().execute();
+		}else{
+			isOnItemClick = false;
+		}
 	}
 
 	@Override
@@ -135,14 +162,33 @@ public class FuzzySearchActivity extends BaseActivity implements
 
 	}
 
+	Runnable flushTextChangeUi1 = new Runnable() {
+
+		@Override
+		public void run() {
+			lv_search_list.setVisibility(View.GONE);
+			lv_tips_list.setVisibility(View.VISIBLE);
+		}
+	};
+
+	Runnable flushTextChangeUi2 = new Runnable() {
+
+		@Override
+		public void run() {
+			lv_search_list.setVisibility(View.GONE);
+			lv_tips_list.setVisibility(View.VISIBLE);
+		}
+	};
+
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.tv_search:
 			InputMethodlUtil.hideInputMethod(FuzzySearchActivity.this,
 					av_autotext);
-			removeListView(emptyAdapter);
+//			removeListView(emptyAdapter);
 			if (!isLoading) {
+				tv_loading.setVisibility(View.VISIBLE);
 				new searchAsycTesk().execute();
 			}
 			break;
@@ -152,6 +198,7 @@ public class FuzzySearchActivity extends BaseActivity implements
 		}
 
 	}
+
 
 	/**
 	 * @param emptyAdapter
@@ -171,12 +218,13 @@ public class FuzzySearchActivity extends BaseActivity implements
 		protected String doInBackground(Void... params) {
 			try {
 				TatansHttp http = new TatansHttp();
-				String name = av_autotext.getText().toString()
-						.replaceAll(" +", "");
-				if (name.equals("")) {
+
+				if (inputText.equals("")) {
+					array.clear();
+					handler.postDelayed(result2json1, 300);
 					return null;
 				}
-				http.get(UrlUtil.AUTO_COMPLETE + name,
+				http.get(UrlUtil.AUTO_COMPLETE + inputText,
 						new HttpRequestCallBack<String>() {
 							@Override
 							public void onLoading(long count, long current) {
@@ -252,34 +300,33 @@ public class FuzzySearchActivity extends BaseActivity implements
 		@Override
 		protected String doInBackground(Void... params) {
 			TatansHttp http = new TatansHttp();
-			final String name = av_autotext.getText().toString()
-					.replaceAll(" +", "");
-			if (name.equals("")) {
+//			final String name = av_autotext.getText().toString()
+//					.replaceAll(" +", "");
+			if (inputText.equals("")) {
 				// net.tatans.coeus.util.Speaker.getInstance(
 				// getApplicationContext()).speech("请在左侧输入框输入您要搜索的内容");
 				handlerSpeak.post(speakRunnable);
 			} else {
-				http.get(UrlUtil.FUZZY_SEARCH + name,
+				http.get(UrlUtil.FUZZY_SEARCH + inputText,
 						new HttpRequestCallBack<String>() {
 							@Override
 							public void onStart() {
 								super.onStart();
 								isLoading = true;
-								lv_search_list.setVisibility(View.GONE);
-								tv_loading.setVisibility(View.VISIBLE);
+								handler.post(flushUi1);
 							}
 
 							@Override
 							public void onSuccess(String arg0) {
 								super.onSuccess(arg0);
-								lv_search_list.setVisibility(View.VISIBLE);
-								currentPage = 1;
-								json2Gson(arg0, name);
+								handler.post(flushUi2);
+								json2Gson(arg0, inputText);
 							}
 
 							@Override
 							public void onFailure(Throwable t, String strMsg) {
 								showToast(AppConstants.FAILED_TO_REQUEST_DATA);
+								tv_loading.setVisibility(View.VISIBLE);
 								tv_loading
 										.setText(AppConstants.FAILED_TO_REQUEST_DATA);
 								isLoading = false;
@@ -293,12 +340,30 @@ public class FuzzySearchActivity extends BaseActivity implements
 
 	}
 
+	Runnable flushUi1 = new Runnable() {
+
+		@Override
+		public void run() {
+			lv_search_list.setVisibility(View.GONE);
+			lv_tips_list.setVisibility(View.GONE);
+			tv_loading.setVisibility(View.VISIBLE);
+		}
+	};
+
+	Runnable flushUi2 = new Runnable() {
+
+		@Override
+		public void run() {
+			lv_search_list.setVisibility(View.VISIBLE);
+			lv_tips_list.setVisibility(View.GONE);
+		}
+	};
+
 	Runnable speakRunnable = new Runnable() {
 
 		@Override
 		public void run() {
-			net.tatans.coeus.util.Speaker.getInstance(getApplicationContext())
-					.speech("请在左侧输入框输入您要搜索的内容");
+			showToast("请在左侧输入框输入您要搜索的内容");
 		}
 	};
 
@@ -373,26 +438,15 @@ public class FuzzySearchActivity extends BaseActivity implements
 		if (searchList.size() == 0) {
 			return;
 		}
-		int to = (int) ((AppConstants.APP_PAGE_SIZE - 1) + (AppConstants.APP_PAGE_SIZE - 1)
-				* (currentPage - 1));
-		int from = (int) ((AppConstants.APP_PAGE_SIZE - 1) * (currentPage - 1));
-		if (to > searchList.size()) {
-			to = searchList.size();
-		}
 		if (isSearch) {
 			showToast("已经为您找到" + searchList.size() + "本与"
 					+ av_autotext.getText() + "相关的小说");
 			isSearch = false;
 		}
-		// else {
-		// showToast("当前所在第" + currentPage + "页，共" + pageCount + "页");
-		// }
-		// listAdapter = new ArrayAdapter<String>(getApplication(),
-		// R.layout.list_item, R.id.tv_item_name, searchList.subList(from,
-		// to));
-		listAdapter = new BookListAdapter(getApplication(), ClassificatList);
-		lv_search_list.setAdapter(listAdapter);
+		bookListAdapter = new BookListAdapter(getApplication(), ClassificatList);
+		lv_search_list.setAdapter(bookListAdapter);
 		isLoading = false;
+		tv_loading.setVisibility(View.VISIBLE);
 	}
 
 	@Override
@@ -438,11 +492,11 @@ public class FuzzySearchActivity extends BaseActivity implements
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
-		Intent intent = new Intent();
-		intent.setClass(FuzzySearchActivity.this, BookBriefActivity.class);
-		intent.putExtra("title", ClassificatList.get(position).getTitle());
-		intent.putExtra("_id", ClassificatList.get(position).get_id());
-		startActivity(intent);
+				Intent intent = new Intent();
+				intent.setClass(FuzzySearchActivity.this, BookBriefActivity.class);
+				intent.putExtra("title", ClassificatList.get(position).getTitle());
+				intent.putExtra("_id", ClassificatList.get(position).get_id());
+				startActivity(intent);
 
 	}
 
@@ -461,10 +515,8 @@ public class FuzzySearchActivity extends BaseActivity implements
 	};
 
 	private void setData() {
-		arrayAdapter = new ArrayAdapter<String>(FuzzySearchActivity.this,
-				android.R.layout.simple_dropdown_item_1line, array);
-		av_autotext.setAdapter(arrayAdapter);
-		arrayAdapter.notifyDataSetChanged();
+		listAdapter = new TitleAdapter(getApplicationContext(), array);
+		lv_tips_list.setAdapter(listAdapter);
 	}
 
 	// private void speechShow(String text) {

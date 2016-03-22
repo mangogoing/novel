@@ -59,6 +59,8 @@ public class UrlUtil {
 
 	/** 下载时章节列表保存文件.TXT位置 */
 	public static final int CHAPTERLIST_TXT = -1;
+	/** 下载时章节列表保存文件.TXT位置 */
+	public static final int SOURCE_LIST_TXT = -2;
 
 	public static final String RESOURCE_BOOK_ID = "http://api.zhuishushenqi.com/toc/";
 

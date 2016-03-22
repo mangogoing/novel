@@ -195,9 +195,9 @@ public class FileUtil {
 	}
 
 	// 创建文件夹并写入数据
-	public static void write(String chapterContent, int i, String _id) {
+	public static void write(String chapterContent, int i, String _id,int sourceNum) {
 		// 创建路径和空的.TXT文件
-		String filenameTemp = DirPath.getMyCacheDir("novel/" + _id, i + ".txt");
+		String filenameTemp = DirPath.getMyCacheDir("novel/" + _id, i +  "_" + sourceNum +".txt");
 		BufferedWriter writer = null;
 		try {
 			File f = new File(filenameTemp);

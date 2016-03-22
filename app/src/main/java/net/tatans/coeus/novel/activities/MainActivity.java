@@ -36,7 +36,7 @@ public class MainActivity extends BaseActivity implements OnItemClickListener {
 		tx_disclaimer = (TextView) findViewById(R.id.tx_disclaimer);
 		tv_local = (TextView) findViewById(R.id.tv_local);
 		speaker = Speaker.getInstance(getApplicationContext());
-		setTitle("小说阅读");
+		setTitle("天坦小说");
 		mainList = new ArrayList<String>();
 		mainList.add("搜索");
 		mainList.add("我的书架");
