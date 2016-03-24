@@ -30,6 +30,7 @@ import net.tatans.coeus.novel.adapter.TitleAdapter;
 import net.tatans.coeus.novel.base.BaseActivity;
 import net.tatans.coeus.novel.constant.AppConstants;
 import net.tatans.coeus.novel.dto.ChapterDto;
+import net.tatans.coeus.novel.dto.CollectorDto;
 import net.tatans.coeus.novel.dto.SummaryDto;
 import net.tatans.coeus.novel.tools.FilePathUtil;
 import net.tatans.coeus.novel.tools.FileUtil;
@@ -53,7 +54,7 @@ public class ChapterListActivity extends BaseActivity implements
     private ListView lv_one_list;
     private TextView tv_loading;
     private TitleAdapter listAdapter;
-    private String title, chapterFilePath;
+    private String title, chapterFilePath,sourceFilePath;
     private int isDownLoad;
     private List<String> titleList = new ArrayList<String>();
     private List<Integer> sortList = new ArrayList<Integer>();
@@ -82,22 +83,21 @@ public class ChapterListActivity extends BaseActivity implements
                 .getBooleanExtra("BookBriefActivity", false);
         title = intent.getStringExtra("title");
         setTitle(title + "章节列表");
-        sourceNum = SharedPreferencesUtil.readData(this);
+        String source = db.findById(bookId, CollectorDto.class)
+                .getSource();
+        sourceNum =Integer.parseInt(source);
         init();
         lv_one_list.setOnItemClickListener(this);
 
     }
 
     private void init() {
-        chapterFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.CHAPTERLIST_TXT, sourceNum);
-        if (isDownLoad == 3) {
-            json2Gson("");
-        }
-        if (isDownLoad == 1 && FileUtil.fileIsExists(chapterFilePath)
-                || isDownLoad == 3 && FileUtil.fileIsExists(chapterFilePath)
-                || isDownLoad == 0 && FileUtil.fileIsExists(chapterFilePath)) {
-            // 如果章节列表txt存在读取章节列表
-            new readFromSDcard().execute();
+        sourceFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.SOURCE_LIST_TXT, 0);
+        if (isDownLoad == 1 && FileUtil.fileIsExists(sourceFilePath)
+                || isDownLoad == 3 && FileUtil.fileIsExists(sourceFilePath)
+                || isDownLoad == 0 && FileUtil.fileIsExists(sourceFilePath)) {
+            // 如果资源列表txt存在读取资源列表
+            new readSummaryListFromSDcard().execute();
 
         } else {
             // 网络请求
@@ -106,13 +106,32 @@ public class ChapterListActivity extends BaseActivity implements
 
     }
 
-    class readFromSDcard extends AsyncTask<Void, Void, String> {
+    class readSummaryListFromSDcard extends AsyncTask<Void, Void, String> {
 
         @Override
         protected String doInBackground(Void... params) {
             try {
-                String result = FileUtil.read(chapterFilePath).toString();
-                json2Gson(result);
+                String result = FileUtil.read(sourceFilePath).toString();
+                summarylist = JsonUtils.getSummaryListByJson(result);
+                if (summarylist.size() > 0) {
+                    if (sourceNum > summarylist.size() - 1) {
+                        sourceNum = summarylist.size() - 1;
+                    }
+                    chapterFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.CHAPTERLIST_TXT, sourceNum);
+                    if (isDownLoad == 3) {
+                        json2Gson("");
+                    }
+                    if (isDownLoad == 1 && FileUtil.fileIsExists(chapterFilePath)
+                            || isDownLoad == 3 && FileUtil.fileIsExists(chapterFilePath)
+                            || isDownLoad == 0 && FileUtil.fileIsExists(chapterFilePath)) {
+                        // 如果章节列表txt存在读取章节列表
+                        String mResult = FileUtil.read(chapterFilePath).toString();
+                        json2Gson(mResult);
+                    } else {
+                        // 网络请求
+                        getSummaryResource(ChapterListActivity.this, mRequestQueue, bookId);
+                    }
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -120,6 +139,7 @@ public class ChapterListActivity extends BaseActivity implements
         }
 
     }
+
 
     List<SummaryDto> summarylist;
 
@@ -166,40 +186,46 @@ public class ChapterListActivity extends BaseActivity implements
      * @return 网站资源列表
      */
     private void getChapterResource(final String newBookId) {
-        InputStream urlStream = null;
-        BufferedReader reader = null;
-        String result = "";
-        try {
-            HttpURLConnection cumtConnection = (HttpURLConnection) new URL(
-                    UrlUtil.RESOURCE_BOOK_ID + newBookId
-                            + "?view=chapters").openConnection();
-            cumtConnection.setRequestProperty("User-Agent",
-                    "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
-            urlStream = cumtConnection.getInputStream();
-            reader = new BufferedReader(
-                    new InputStreamReader(urlStream, "UTF-8"));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                result = result + line;
-            }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+            InputStream urlStream = null;
+            BufferedReader reader = null;
+            String result = "";
             try {
-                reader.close();
-                urlStream.close();
+                HttpURLConnection cumtConnection = (HttpURLConnection) new URL(
+                        UrlUtil.RESOURCE_BOOK_ID + newBookId
+                                + "?view=chapters").openConnection();
+                cumtConnection.setRequestProperty("User-Agent",
+                        "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
+                urlStream = cumtConnection.getInputStream();
+                reader = new BufferedReader(
+                        new InputStreamReader(urlStream, "UTF-8"));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result = result + line;
+                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    reader.close();
+                    urlStream.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        titleList = JsonUtils.getChapterNameListByJson(result);
-        for (int i = 0; i < titleList.size(); i++) {
-            sortList.add(i + 1);
-        }
-        handler.post(result2json);
+            titleList = JsonUtils.getChapterNameListByJson(result);
+            for (int i = 0; i < titleList.size(); i++) {
+                sortList.add(i + 1);
+            }
+            handler.post(result2json);
+          }
 
+        }).start();
 
     }
 

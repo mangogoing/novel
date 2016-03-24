@@ -77,7 +77,7 @@ public class RankActivity extends BaseActivity {
 					super.onSuccess(arg0);
 					lv_main.setVisibility(View.VISIBLE);
 					json2Gson(arg0);
-					handler.post(result2json);
+//					handler.post(result2json);
 
 				}
 
@@ -179,6 +179,7 @@ public class RankActivity extends BaseActivity {
 		if (to > al_rankingList.size()) {
 			to = al_rankingList.size();
 		}
+		al_rankingList.remove(2);
 		adapter = new RankAdapter(al_rankingList,
 				this.getApplicationContext(), (int) AppConstants.APP_PAGE_SIZE);
 		lv_main.setAdapter(adapter);

@@ -6,6 +6,7 @@ import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -35,6 +36,7 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
     private int totalChapterCount;
     private String bookId;
     public TatansDb db;
+    private String source = "0";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +46,8 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
         setTitle("更多");
         initView();
         initdata();
+        source = db.findById(bookId, CollectorDto.class)
+                .getSource();
         // new myAsycTesk().execute();
     }
 
@@ -230,7 +234,7 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
             } else {
                 showToast("已加入缓存队列");
                 CollectorDto collector = new CollectorDto(bookId, title, 0, 2,
-                        new Date(), totalChapterCount, 0, -1, 0, "");
+                        new Date(), totalChapterCount, 0, -1, 0, source);
                 db.update(collector);
             }
             return;
@@ -239,6 +243,8 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
                 DownLoadService.class);
         downLoadIntent.putExtra("bookId", bookId);
         downLoadIntent.putExtra("title", title);
+        downLoadIntent.putExtra("source", source);
+        Log.d("OOOOOOOO", source);
         // Boolean flag = true;
         // // 判断是否已经下载过
         // List<CollectorDto> MyList = db.findAllByWhere(CollectorDto.class,
@@ -255,7 +261,7 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
         // if (flag) {
         // 加入到书藏书籍数据库
         CollectorDto collector = new CollectorDto(bookId, title, 0, 0,
-                new Date(), totalChapterCount, 0, -1, 0, "");
+                new Date(), totalChapterCount, 0, -1, 0, source);
         if (collerctor == null) {
             db.save(collector);
         } else {

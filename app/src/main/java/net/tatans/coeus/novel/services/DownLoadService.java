@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -76,6 +77,8 @@ public class DownLoadService extends Service {
             chapterlist.clear();
             bookId = intent.getStringExtra("bookId");
             title = intent.getStringExtra("title");
+            sourceNum = Integer.parseInt(intent.getStringExtra("source"));
+            Log.d("OOOOOOOO", sourceNum+"---------");
             mRequestQueue = Volley.newRequestQueue(this);
 
             if (bookId != null) {
@@ -132,49 +135,54 @@ public class DownLoadService extends Service {
     /**
      * 获取章节列表
      */
-    private void AnalyzeTocs(String string) {
+    private void AnalyzeTocs(final String string) {
+        new Thread(new Runnable() {
 
-        sourceNum = SharedPreferencesUtil.readData(this);
-        List<SummaryDto> summarylist = JsonUtils.getSummaryListByJson(string);
-        if (summarylist.size() > 0) {
-            if (sourceNum > summarylist.size() - 1) {
-                sourceNum = summarylist.size() - 1;
-            }
-            viewChaptersUrl = UrlUtil.VIEW_CHAPTERS
-                    + summarylist.get(sourceNum).get_id() + "?view=chapters";
-        }
-
-        StringRequest jrChapterLists = new StringRequest(Request.Method.GET,
-                viewChaptersUrl, new Response.Listener<String>() {
             @Override
-            public void onResponse(String response) {
-                System.out.println(response);
-                System.out.println(viewChaptersUrl);
-                /** 目錄写入.TXT文件保存 */
-                FileUtil.write(response.toString(),
-                        UrlUtil.CHAPTERLIST_TXT, bookId, sourceNum);
-                downLoadChapters(response);
+            public void run() {
+                List<SummaryDto> summarylist = JsonUtils.getSummaryListByJson(string);
+                if (summarylist.size() > 0) {
+                    if (sourceNum > summarylist.size() - 1) {
+                        sourceNum = summarylist.size() - 1;
+                    }
+                    viewChaptersUrl = UrlUtil.VIEW_CHAPTERS
+                            + summarylist.get(sourceNum).get_id() + "?view=chapters";
+                }
+
+                StringRequest jrChapterLists = new StringRequest(Request.Method.GET,
+                        viewChaptersUrl, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        System.out.println(response);
+                        System.out.println(viewChaptersUrl);
+                        /** 目錄写入.TXT文件保存 */
+                        FileUtil.write(response.toString(),
+                                UrlUtil.CHAPTERLIST_TXT, bookId, sourceNum);
+                        downLoadChapters(response);
+                    }
+
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        showToast("未能请求到数据，请检查网络");
+                        stopSelf();
+                    }
+                }) {
+                    @Override
+                    public Map<String, String> getHeaders() {
+                        Map<String, String> headers = new HashMap<String, String>();
+                        headers.put("User-Agent",
+                                "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
+                        headers.put("Content-Encoding", "gzip");
+                        headers.put("Content-Type", " application/json; charset=utf-8");
+                        return headers;
+                    }
+
+                };
+                mRequestQueue.add(jrChapterLists);
             }
 
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                showToast("未能请求到数据，请检查网络");
-                stopSelf();
-            }
-        }) {
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("User-Agent",
-                        "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
-                headers.put("Content-Encoding", "gzip");
-                headers.put("Content-Type", " application/json; charset=utf-8");
-                return headers;
-            }
-
-        };
-        mRequestQueue.add(jrChapterLists);
+        }).start();
     }
 
     @Override
@@ -198,12 +206,20 @@ public class DownLoadService extends Service {
         TatansToast.showAndCancel(text);
     }
 
+    Handler handler = new Handler();
+
     // 開啟volley网络下載章節內容
     public void downLoadChapters(String response) {
         JSONObject json;
         try {
             json = new JSONObject(response);
-            TatansToast.showAndCancel("开始缓存:" + title);
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    TatansToast.showAndCancel("开始缓存:" + title);
+                }
+            });
+
             JSONArray array;
             try {
                 array = json.getJSONArray("chapters");
@@ -247,7 +263,7 @@ public class DownLoadService extends Service {
                             @Override
                             public void onErrorResponse(
                                     VolleyError error) {
-										/*
+                                        /*
 										 * Log.d("MYTAG", j + ""); if (j % 80 ==
 										 * 0) { send(j, true); } else if
 										 * (chapterlist.size() - 1 == j) {

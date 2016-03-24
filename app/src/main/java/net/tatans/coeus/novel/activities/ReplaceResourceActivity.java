@@ -4,62 +4,65 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import net.tatans.coeus.network.callback.HttpRequestCallBack;
+import net.tatans.coeus.network.tools.TatansDb;
 import net.tatans.coeus.network.tools.TatansHttp;
 import net.tatans.coeus.network.tools.TatansToast;
 import net.tatans.coeus.network.util.HttpProces;
 import net.tatans.coeus.novel.R;
+import net.tatans.coeus.novel.adapter.TitleAdapter;
 import net.tatans.coeus.novel.base.BaseActivity;
 import net.tatans.coeus.novel.constant.AppConstants;
 import net.tatans.coeus.novel.dto.ChapterDto;
+import net.tatans.coeus.novel.dto.CollectorDto;
 import net.tatans.coeus.novel.dto.SummaryDto;
 import net.tatans.coeus.novel.tools.FilePathUtil;
 import net.tatans.coeus.novel.tools.FileUtil;
 import net.tatans.coeus.novel.tools.JsonUtils;
-import net.tatans.coeus.novel.tools.SharedPreferencesUtil;
 import net.tatans.coeus.novel.tools.UrlUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class ReplaceResourceActivity extends BaseActivity implements
         OnItemClickListener {
 
     private ListView lv_one_list;
-    private ArrayAdapter<String> listAdapter;
+    private TitleAdapter listAdapter;
     private String title;
     private int isDownLoad;
     private int currentPage = 1;
     private List<String> titleList = new ArrayList<String>();
-    Handler handler = new Handler();
+    private List<String> isDownloadList = new ArrayList<String>();
+    private Handler handler = new Handler();
     private boolean isSpeak;
-    private String bookId, chapterFilePath;
+    private String bookId, sourceListFilePath;
     private int totalChapterCount;
     private int currentPosition;
     protected List<ChapterDto> ChapterList;
     private RequestQueue mRequestQueue;
     private int sourceNum;
+    private TatansDb db;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.list);
+        db = TatansDb.create(AppConstants.TATANS_DB_NAME);
         lv_one_list = (ListView) findViewById(R.id.lv_main);
         mRequestQueue = Volley.newRequestQueue(ReplaceResourceActivity.this);
         Intent intent = getIntent();
@@ -70,17 +73,18 @@ public class ReplaceResourceActivity extends BaseActivity implements
         title = intent.getStringExtra("title");
         setTitle(title + "资源列表");
         lv_one_list.setOnItemClickListener(this);
-        sourceNum = SharedPreferencesUtil
-                .readData(ReplaceResourceActivity.this);
+        String source = db.findById(bookId, CollectorDto.class)
+                .getSource();
+        sourceNum = Integer.parseInt(source);
         init();
 
     }
 
     private void init() {
-        chapterFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.SOURCE_LIST_TXT, 0);
-        if (isDownLoad == 1 && FileUtil.fileIsExists(chapterFilePath)
-                || isDownLoad == 3 && FileUtil.fileIsExists(chapterFilePath)
-                || isDownLoad == 0 && FileUtil.fileIsExists(chapterFilePath)) {
+        sourceListFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.SOURCE_LIST_TXT, 0);
+        if (isDownLoad == 1 && FileUtil.fileIsExists(sourceListFilePath)
+                || isDownLoad == 3 && FileUtil.fileIsExists(sourceListFilePath)
+                || isDownLoad == 0 && FileUtil.fileIsExists(sourceListFilePath)) {
             // 如果章节列表txt存在读取章节列表
             new readFromSDcard().execute();
 
@@ -96,9 +100,16 @@ public class ReplaceResourceActivity extends BaseActivity implements
         @Override
         protected String doInBackground(Void... params) {
             try {
-                String result = FileUtil.read(chapterFilePath).toString();
+                String result = FileUtil.read(sourceListFilePath).toString();
                 summarylist = JsonUtils.getSummaryListByJson(result);
+                String chapterFilePath;
                 for (int i = 0; i < summarylist.size(); i++) {
+                    chapterFilePath = FilePathUtil.getFilePath(bookId, -1, i);
+                    if (FileUtil.fileIsExists(chapterFilePath)) {
+                        isDownloadList.add("已下载");
+                    } else {
+                        isDownloadList.add("未下载");
+                    }
                     titleList.add(summarylist.get(i).getName());
                 }
                 if (summarylist.size() > 0) {
@@ -184,8 +195,7 @@ public class ReplaceResourceActivity extends BaseActivity implements
             to = titleList.size();
         }
 
-        listAdapter = new ArrayAdapter<String>(getApplication(),
-                R.layout.list_item, R.id.tv_item_name, titleList);
+        listAdapter = new TitleAdapter(getApplicationContext(), titleList);
         lv_one_list.setAdapter(listAdapter);
         lv_one_list.setVisibility(View.VISIBLE);
     }
@@ -193,17 +203,40 @@ public class ReplaceResourceActivity extends BaseActivity implements
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position,
                             long id) {
-        SharedPreferencesUtil.saveData(this, position);
-        Intent intent = new Intent();
-        intent.putExtra("bookId", bookId);
-        intent.putExtra("totalChapterCount", totalChapterCount);
-        intent.putExtra("isDownLoad", isDownLoad);
-        intent.putExtra("sourceNum", position);
-        intent.putExtra("currentPosition", currentPosition);
-        intent.putExtra("title", title);
-        intent.setClass(ReplaceResourceActivity.this, MoreActivity.class);
-        setResult(RESULT_OK, intent);
-        finish();
+        CollectorDto collerctor = db.findById(bookId, CollectorDto.class);
+        // 加入到书藏书籍数据库
+        if (sourceNum != position) {
+            String filePath = Environment.getExternalStorageDirectory()
+                    + "/tatans/novel/" + bookId;
+            final File file = new File(filePath);
+            new Thread(new Runnable() {
+                public void run() {
+                    FileUtil.delete(file);
+                }
+            }).start();
+
+            CollectorDto collector = new CollectorDto(bookId, title, 0, -1,
+                    new Date(), totalChapterCount, 0, -1, 0, position + "");
+            if (collerctor == null) {
+                db.save(collector);
+            } else {
+                db.update(collector);
+            }
+            Intent intent = new Intent();
+            intent.putExtra("bookId", bookId);
+            intent.putExtra("totalChapterCount", totalChapterCount);
+            intent.putExtra("isDownLoad", isDownLoad);
+            intent.putExtra("sourceNum", position);
+            intent.putExtra("currentPosition", currentPosition);
+            intent.putExtra("title", title);
+            intent.setClass(ReplaceResourceActivity.this, MoreActivity.class);
+            setResult(RESULT_OK, intent);
+            finish();
+        } else {
+            showToast("当前资源为已选中资源，请选择其他资源换源。");
+        }
+
+
     }
 
     @Override

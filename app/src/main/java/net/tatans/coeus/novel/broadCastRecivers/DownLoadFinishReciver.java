@@ -67,6 +67,8 @@ public class DownLoadFinishReciver extends BroadcastReceiver {
 						.get_id());
 				downLoadIntent.putExtra("title", CollectorDtoList.get(0)
 						.getTitle());
+				downLoadIntent.putExtra("source", CollectorDtoList.get(0)
+						.getSource());
 				Handler handler = new Handler();
 				handler.postDelayed(new Runnable() {
 

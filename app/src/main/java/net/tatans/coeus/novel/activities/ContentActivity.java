@@ -54,18 +54,58 @@ public class ContentActivity extends ContentSplitActivity {
     private static String TAG = "ContentActivity";
     private String strContent; // 资讯内容
     private TatansDb db;
-    private String chapterFilePath;
+    private String chapterFilePath, sourceFilePath;
     private List<ChapterDto> ChapterList;
     private String filePath;
     private RequestQueue mRequestQueue;
     private int sourceNum = 0;
+    private String source;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = TatansDb.create(AppConstants.TATANS_DB_NAME);
-        sourceNum = SharedPreferencesUtil.readData(this);
-        display();
+        init();
+
+    }
+
+    private void init() {
+        source = db.findById(bookId, CollectorDto.class)
+                .getSource();
+        sourceNum = Integer.parseInt(source);
+        sourceFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.SOURCE_LIST_TXT, 0);
+        if (isDownLoad == 1 && FileUtil.fileIsExists(sourceFilePath)
+                || isDownLoad == 3 && FileUtil.fileIsExists(sourceFilePath)
+                || isDownLoad == 0 && FileUtil.fileIsExists(sourceFilePath)) {
+            // 如果资源列表txt存在读取资源列表
+            new readSummaryListFromSDcard().execute();
+
+        } else {
+            // 网络请求
+            getSummaryResource(this, mRequestQueue, bookId);
+        }
+    }
+
+
+    class readSummaryListFromSDcard extends AsyncTask<Void, Void, String> {
+
+        @Override
+        protected String doInBackground(Void... params) {
+            try {
+                String result = FileUtil.read(sourceFilePath).toString();
+                summarylist = JsonUtils.getSummaryListByJson(result);
+                if (summarylist.size() > 0) {
+                    if (sourceNum > summarylist.size() - 1) {
+                        sourceNum = summarylist.size() - 1;
+                    }
+                    display();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
     }
 
     private void display() {
@@ -90,6 +130,7 @@ public class ContentActivity extends ContentSplitActivity {
         }
         playPlayback();
     }
+
 
     private void playPlayback() {
 
@@ -201,59 +242,65 @@ public class ContentActivity extends ContentSplitActivity {
 
 
     private void getContentResource(final String link) {
-        BufferedReader reader = null;
-        InputStream urlStream = null;
-        String result = "";
-        try {
-            String url1 = "http://chapter2.zhuishushenqi.com";
-            String url2 = "/chapter/" + URLEncoder.encode(link, "UTF8");
-            String key = CipherUtil.getKey_t(url2);
-            String url = url1 + url2 + "?" + key;
-            HttpURLConnection cumtConnection;
-            cumtConnection = (HttpURLConnection) new URL(url)
-                    .openConnection();
-            cumtConnection.setRequestProperty("User-Agent",
-                    "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
-            urlStream = cumtConnection.getInputStream();
-            reader = new BufferedReader(
-                    new InputStreamReader(urlStream, "UTF-8"));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                result = result + line;
-            }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                reader.close();
-                urlStream.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        if (result.equals("")) {
-            setContent("未能获取到资源，在更多选项中选择其他资源试试吧");
-        } else {
-            String str = JsonUtils.getNovelContent(result).replaceAll(
-                    " ", "");
-            str = str.replace("\n", "");
-            strContent = (currentPosition + 1) + "。"
-                    + ChapterList.get(currentPosition).getTitle() + "。"
-                    + "\n正文：" + str;
+        new Thread(new Runnable() {
 
-            if (isCollector) {
-                isCollector = false;
-            } else {
-                countPage = 0;
-                sentenceIndex = -1;
-                position = 0;
+            @Override
+            public void run() {
+                BufferedReader reader = null;
+                InputStream urlStream = null;
+                String result = "";
+                try {
+                    String url1 = "http://chapter2.zhuishushenqi.com";
+                    String url2 = "/chapter/" + URLEncoder.encode(link, "UTF8");
+                    String key = CipherUtil.getKey_t(url2);
+                    String url = url1 + url2 + "?" + key;
+                    HttpURLConnection cumtConnection;
+                    cumtConnection = (HttpURLConnection) new URL(url)
+                            .openConnection();
+                    cumtConnection.setRequestProperty("User-Agent",
+                            "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
+                    urlStream = cumtConnection.getInputStream();
+                    reader = new BufferedReader(
+                            new InputStreamReader(urlStream, "UTF-8"));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        result = result + line;
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        reader.close();
+                        urlStream.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (result.equals("")) {
+                    setContent("未能获取到资源，在更多选项中选择其他资源试试吧");
+                } else {
+                    String str = JsonUtils.getNovelContent(result).replaceAll(
+                            " ", "");
+                    str = str.replace("\n", "");
+                    strContent = (currentPosition + 1) + "。"
+                            + ChapterList.get(currentPosition).getTitle() + "。"
+                            + "\n正文：" + str;
+
+                    if (isCollector) {
+                        isCollector = false;
+                    } else {
+                        countPage = 0;
+                        sentenceIndex = -1;
+                        position = 0;
+                    }
+
+                    setContent(strContent);
+                }
             }
 
-            setContent(strContent);
-        }
-
+        }).start();
 
     }
 
@@ -350,7 +397,12 @@ public class ContentActivity extends ContentSplitActivity {
     }
 
     public void nextChapter() {
-        load.setVisibility(View.VISIBLE);
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                load.setVisibility(View.VISIBLE);
+            }
+        });
         if (isDownLoad != -1) {
             dwonLoadNextChapter();
             return;
@@ -447,7 +499,7 @@ public class ContentActivity extends ContentSplitActivity {
                 totalChapterCount = data.getIntExtra("totalChapterCount", 0);
                 bookId = data.getStringExtra("bookId");
                 sourceNum = data.getIntExtra("sourceNum", 0);
-                display();
+                init();
             }
         } else if (requestCode == 2) {
             if (resultCode == RESULT_OK) {
@@ -455,7 +507,7 @@ public class ContentActivity extends ContentSplitActivity {
                 if (isCollect) {
                     CollectorDto collector = new CollectorDto(bookId, title,
                             currentPosition, -1, new Date(), totalChapterCount,
-                            countPage, sentenceIndex, position, "");
+                            countPage, sentenceIndex, position, source);
                     db.save(collector);
                     finish();
                     showToast("收藏成功");
@@ -495,7 +547,7 @@ public class ContentActivity extends ContentSplitActivity {
                 CollectorDto collector = new CollectorDto(bookId,
                         item.getTitle(), currentPosition, item.getIsDownLoad(),
                         new Date(), totalChapterCount, countPage,
-                        sentenceIndex, position, "");
+                        sentenceIndex, position, source);
                 db.update(collector);
                 return;
             }
@@ -536,7 +588,7 @@ public class ContentActivity extends ContentSplitActivity {
                         CollectorDto collector = new CollectorDto(bookId,
                                 title, currentPosition, -1, new Date(),
                                 totalChapterCount, countPage, sentenceIndex,
-                                position, "");
+                                position, source);
                         db.save(collector);
                         appSpeaker.speech("收藏成功", new Callback() {
                             @Override
