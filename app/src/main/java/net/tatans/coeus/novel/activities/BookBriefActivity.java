@@ -303,7 +303,6 @@ public class BookBriefActivity extends BaseActivity implements
                     } else {
                         db.update(collector);
                     }
-                    showToast("准备缓存");
                     // 进度条显示
                     tv_progress.setVisibility(View.VISIBLE);
                     tv_downLoad.setEnabled(false);

@@ -1,6 +1,7 @@
 package net.tatans.coeus.novel.adapter;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
@@ -48,6 +49,7 @@ public class CollectorAdapter extends BaseAdapter {
     private float pageSize;
     private int to, from, currentPage;
     TatansDb db = TatansDb.create(AppConstants.TATANS_DB_NAME);
+    private String dailog = "";
 
     public CollectorAdapter(List<CollectorDto> list, Context context,
                             float pageSize, int currentPage, Map<String, Integer> map) {
@@ -127,26 +129,26 @@ public class CollectorAdapter extends BaseAdapter {
                     String Tag = ": " + (double) convertView.getTag() + "%已缓存";
                     text = text + Tag;
                 }
-                imageView.setContentDescription("取消緩存。");
+                imageView.setContentDescription("取消緩存" + title + "。");
                 status.setImageResource(R.drawable.down_loading);
                 status.setContentDescription("下载中");
             } else if (collcetor.getIsDownLoad() == 2) {
                 // 若为列队下载
                 text = text + ": 等待缓存中";
-                imageView.setContentDescription("取消緩存");
+                imageView.setContentDescription("取消緩存" + title + "。");
                 status.setImageResource(R.drawable.be_queued);
                 status.setContentDescription("等待中");
             } else if (collcetor.getIsDownLoad() == 1) {
-                imageView.setContentDescription("移除小说。");
+                imageView.setContentDescription("移除小说" + title + "。");
                 status.setImageResource(R.drawable.down_loaded);
                 status.setContentDescription("已下载");
             } else if (collcetor.getIsDownLoad() == 3) {
-                imageView.setContentDescription("移除小说。");
+                imageView.setContentDescription("移除小说" + title + "。");
                 status.setImageResource(R.drawable.local_file);
                 status.setContentDescription("本地小说");
             } else {
                 // 仅仅收藏过
-                imageView.setContentDescription("取消收藏。");
+                imageView.setContentDescription("取消收藏" + title + "。");
                 status.setImageResource(R.drawable.collected);
                 status.setContentDescription("已收藏");
             }
@@ -158,14 +160,18 @@ public class CollectorAdapter extends BaseAdapter {
         /**
          * 删除键的点击事件
          */
+
         imageView.setOnClickListener(new OnClickListener() {
             // 删除
             @Override
             public void onClick(View v) {
+                final ProgressDialog proDia = new ProgressDialog(context);
+                proDia.setTitle("移除中");
+                proDia.setCancelable(false);
+                proDia.show();
                 try {
                     if (isDelete) {
                         isDelete = false;
-                        String dailog = "";
                         String filePath = Environment.getExternalStorageDirectory()
                                 + "/tatans/novel/" + _id;
                         final File file = new File(filePath);
@@ -183,16 +189,15 @@ public class CollectorAdapter extends BaseAdapter {
                             dailog = "取消下载并";
                             startDownLoadNext();
                         }
-                        new Thread(new Runnable() {
-                            public void run() {
-                                FileUtil.delete(file);
-                            }
-                        }).start();
+//                        new Thread(new Runnable() {
+//                            public void run() {
+                        FileUtil.delete(file);
+//                            }
+//                        }).start();
 
 
                         db.delete(item);
                         list.remove(item);
-                        TatansToast.showAndCancel(title + dailog + "移除成功");
                         CollectorActivity.pageCount = (int) Math.ceil(list.size()
                                 / AppConstants.APP_PAGE_SIZE);
                         init();
@@ -215,6 +220,14 @@ public class CollectorAdapter extends BaseAdapter {
 
                 } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            proDia.dismiss();
+                            TatansToast.showAndCancel(title + dailog + "移除成功");
+                        }
+                    }, 1000);
                 }
             }
         });
@@ -329,4 +342,5 @@ public class CollectorAdapter extends BaseAdapter {
 
         }
     }
+
 }

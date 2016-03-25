@@ -128,13 +128,24 @@ public class ContentSplitActivity extends BaseActivity {
     @Override
     public void up() {
         if ("暂停".equals(pause_or_play.getText().toString())) {
+            appSpeaker.speech("暂停播放");
             speakPause();
         } else {
             if (isComplete) {
                 speaker.speech("本章内容已读完");
                 return;
             }
-            speakResume();
+            appSpeaker.speech("继续播放", new Callback() {
+                @Override
+                public void onStart() {
+                    super.onStart();
+                }
+
+                @Override
+                public void onDone() {
+                    speakResume();
+                }
+            });
         }
     }
 
@@ -428,8 +439,6 @@ public class ContentSplitActivity extends BaseActivity {
                         readNextSentence();
                     }
                 }
-
-                ;
             });
         } else if (flag == 1) {// 下一条
             pause_or_play.setText("暂停");

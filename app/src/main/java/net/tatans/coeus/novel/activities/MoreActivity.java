@@ -26,6 +26,7 @@ import net.tatans.coeus.speech.util.NetWorkUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class MoreActivity extends BaseActivity implements OnClickListener {
     private String title;
@@ -91,7 +92,17 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
 
     @Override
     public void onClick(View v) {
+        int isDownLoad;
+        CollectorDto collerctor = db.findById(bookId, CollectorDto.class);
+        if (collerctor == null) {
+            isDownLoad = -2;
+        } else {
+            isDownLoad = db.findById(bookId, CollectorDto.class)
+                    .getIsDownLoad();
+        }
+
         switch (v.getId()) {
+
             case R.id.ll_goto:
                 String chapterText = input_chapter.getText().toString();
                 int chapter = 0;
@@ -130,7 +141,7 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
                 break;
             case R.id.ll_cache:
                 // 打开service下载下一个等待缓存的
-                download();
+                download(collerctor);
                 break;
             case R.id.ll_replace_resource:
                 if (isDownLoad != 3) {
@@ -206,87 +217,68 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
         TatansToast.cancel();
     }
 
-    private void download() {
-        if (!NetWorkUtil.hasNetworkConnection(MoreActivity.this)) {
-            showToast("当前网络未连接，请检查网络");
-            return;
-        }
-        int isDownLoad;
-        CollectorDto collerctor = db.findById(bookId, CollectorDto.class);
-        if (collerctor == null) {
-            isDownLoad = -1;
-        } else {
-            isDownLoad = db.findById(bookId, CollectorDto.class)
-                    .getIsDownLoad();
-        }
-        if (isDownLoad == 3) {
-            showToast("本地小说无法下载");
-            return;
-        }
-
-        if (isWorked(getApplicationContext())) {
-            if (collerctor != null && isDownLoad == 0) {
+    private void download(CollectorDto collerctor) {
+        Log.e("TTTTTTTT", "--------" + BookBriefActivity.isWorked(getApplicationContext()));
+        if (BookBriefActivity.isWorked(getApplicationContext())) {
+            if (collerctor != null && collerctor.getIsDownLoad() == 0) {
                 showToast("该小说正在下载中,勿重复操作");
                 return;
-            } else if (collerctor != null && isDownLoad == 2) {
+            } else if (collerctor != null
+                    && collerctor.getIsDownLoad() == 1) {
+                showToast("该小说已缓存完成,勿重复操作");
+                return;
+            } else if (collerctor != null
+                    && collerctor.getIsDownLoad() == 2) {
                 showToast("该小说已经在缓存队列中,勿重复操作");
                 return;
             } else {
                 showToast("已加入缓存队列");
-                CollectorDto collector = new CollectorDto(bookId, title, 0, 2,
-                        new Date(), totalChapterCount, 0, -1, 0, source);
+                CollectorDto collector = new CollectorDto(bookId, title, 0,
+                        2, new Date(), totalChapterCount, 0, -1, 0, source);
+//                if (collerctor != null && isDownLoad == -1) {
                 db.update(collector);
+//                } else {
+//                    db.save(collector);
+//                }
             }
             return;
         }
-        Intent downLoadIntent = new Intent(MoreActivity.this,
+        final Intent downLoadIntent = new Intent(MoreActivity.this,
                 DownLoadService.class);
         downLoadIntent.putExtra("bookId", bookId);
         downLoadIntent.putExtra("title", title);
         downLoadIntent.putExtra("source", source);
-        Log.d("OOOOOOOO", source);
-        // Boolean flag = true;
-        // // 判断是否已经下载过
-        // List<CollectorDto> MyList = db.findAllByWhere(CollectorDto.class,
-        // "isDownLoad = 1");
-        // if (MyList.size() != 0) {
-        // for (int i = 0; i < MyList.size(); i++) {
-        // if (MyList.get(i).get_id().equals(sourceId)) {
-        // showToast("您已经缓存过该小说");
-        // flag = false;
-        // break;
-        // }
-        // }
-        // }
-        // if (flag) {
-        // 加入到书藏书籍数据库
-        CollectorDto collector = new CollectorDto(bookId, title, 0, 0,
-                new Date(), totalChapterCount, 0, -1, 0, source);
-        if (collerctor == null) {
-            db.save(collector);
-        } else {
-            db.update(collector);
+        Boolean flag = true;
+        // 判断是否已经下载过
+//        List<CollectorDto> MyList = db.findAllByWhere(CollectorDto.class,
+//                "isDownLoad = 1");
+//        if (MyList.size() != 0) {
+//            for (int i = 0; i < MyList.size(); i++) {
+//                if (MyList.get(i).get_id().equals(bookId)) {
+//                    showToast("您已经缓存过该小说");
+//                    tv_downLoad.setText("已缓存");
+//                    tv_downLoad.setEnabled(false);
+//                    tv_downLoad.setContentDescription("缓存完成");
+//                    flag = false;
+//                    break;
+//                }
+//            }
+//        }
+        if (flag) {
+            // 加入到书藏书籍数据库
+            CollectorDto collector = new CollectorDto(bookId, title, 0, 0,
+                    new Date(), totalChapterCount, 0, -1, 0, source);
+            if (collerctor == null) {
+                db.save(collector);
+            } else {
+                db.update(collector);
+            }
+            // 进度条显示
+            startService(downLoadIntent);
+
         }
-        showToast("准备缓存");
-        // 进度条显示
-        startService(downLoadIntent);
-        // }
     }
 
-    // 判断下载service是否已在工作
-    public static boolean isWorked(Context context) {
-        ActivityManager myManager = (ActivityManager) context
-                .getSystemService(ACTIVITY_SERVICE);
-        ArrayList<RunningServiceInfo> runningService = (ArrayList<RunningServiceInfo>) myManager
-                .getRunningServices(45);
-        for (int i = 0; i < runningService.size(); i++) {
-            if (runningService.get(i).service.getClassName().toString()
-                    .equals("net.tatans.coeus.novel.DownLoadService")) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     @Override
     public void left() {

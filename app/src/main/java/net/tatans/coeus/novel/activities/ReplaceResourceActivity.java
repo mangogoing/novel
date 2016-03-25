@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -27,6 +28,7 @@ import net.tatans.coeus.novel.constant.AppConstants;
 import net.tatans.coeus.novel.dto.ChapterDto;
 import net.tatans.coeus.novel.dto.CollectorDto;
 import net.tatans.coeus.novel.dto.SummaryDto;
+import net.tatans.coeus.novel.services.DownLoadService;
 import net.tatans.coeus.novel.tools.FilePathUtil;
 import net.tatans.coeus.novel.tools.FileUtil;
 import net.tatans.coeus.novel.tools.JsonUtils;
@@ -204,17 +206,22 @@ public class ReplaceResourceActivity extends BaseActivity implements
     public void onItemClick(AdapterView<?> parent, View view, int position,
                             long id) {
         CollectorDto collerctor = db.findById(bookId, CollectorDto.class);
+
+        int isDownLoad;
+        if (collerctor == null) {
+            isDownLoad = -2;
+        } else {
+            isDownLoad = db.findById(bookId, CollectorDto.class)
+                    .getIsDownLoad();
+        }
         // 加入到书藏书籍数据库
         if (sourceNum != position) {
-            String filePath = Environment.getExternalStorageDirectory()
-                    + "/tatans/novel/" + bookId;
-            final File file = new File(filePath);
-            new Thread(new Runnable() {
-                public void run() {
-                    FileUtil.delete(file);
-                }
-            }).start();
-
+            // 下载完成停止该service
+            Intent finishIntent = new Intent(UrlUtil.FINISH_ACTION);
+            finishIntent.putExtra("bookId", bookId);
+            finishIntent.putExtra("replace", true);
+            finishIntent.putExtra("isLoading", isLoading(collerctor));
+            sendBroadcast(finishIntent);
             CollectorDto collector = new CollectorDto(bookId, title, 0, -1,
                     new Date(), totalChapterCount, 0, -1, 0, position + "");
             if (collerctor == null) {
@@ -222,6 +229,16 @@ public class ReplaceResourceActivity extends BaseActivity implements
             } else {
                 db.update(collector);
             }
+
+//            String filePath = Environment.getExternalStorageDirectory()
+//                    + "/tatans/novel/" + bookId;
+//            final File file = new File(filePath);
+//            new Thread(new Runnable() {
+//                public void run() {
+//                    FileUtil.delete(file);
+//                }
+//            }).start();
+
             Intent intent = new Intent();
             intent.putExtra("bookId", bookId);
             intent.putExtra("totalChapterCount", totalChapterCount);
@@ -258,6 +275,17 @@ public class ReplaceResourceActivity extends BaseActivity implements
 
     private void showToast(String text) {
         TatansToast.showAndCancel(text);
+    }
+
+    private boolean isLoading(CollectorDto collerctor) {
+        Log.e("TTTTTTTT", "--------" + BookBriefActivity.isWorked(getApplicationContext()));
+        if (BookBriefActivity.isWorked(getApplicationContext())) {
+            if (collerctor != null && collerctor.getIsDownLoad() == 0) {
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
 
 }

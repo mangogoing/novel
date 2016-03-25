@@ -231,13 +231,19 @@ public class ContentActivity extends ContentSplitActivity {
                 if (result.equals("")) {
                     setContent("未能获取到资源，在更多选项中选择其他资源试试吧");
                 } else {
-                    ChapterList = JsonUtils.getChapterListByJson(result);
-                    getContentResource(ChapterList.get(currentPosition)
-                            .getLink());
+                    try {
+                        ChapterList = JsonUtils.getChapterListByJson(result);
+                        getContentResource(ChapterList.get(currentPosition)
+                                .getLink());
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        setContent("未能获取到资源，在更多选项中选择其他资源试试吧");
+                    }
                 }
             }
-
-        }).start();
+        }
+        ).start();
     }
 
 

@@ -18,7 +18,10 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.ushaqi.zhuishushenqi.util.CipherUtil;
 
+import net.tatans.coeus.network.callback.HttpRequestCallBack;
+import net.tatans.coeus.network.tools.TatansHttp;
 import net.tatans.coeus.network.tools.TatansToast;
+import net.tatans.coeus.network.util.HttpProces;
 import net.tatans.coeus.novel.dto.ChapterDto;
 import net.tatans.coeus.novel.dto.SummaryDto;
 import net.tatans.coeus.novel.tools.FileUtil;
@@ -78,12 +81,10 @@ public class DownLoadService extends Service {
             bookId = intent.getStringExtra("bookId");
             title = intent.getStringExtra("title");
             sourceNum = Integer.parseInt(intent.getStringExtra("source"));
-            Log.d("OOOOOOOO", sourceNum+"---------");
             mRequestQueue = Volley.newRequestQueue(this);
-
+            showToast("准备缓存");
             if (bookId != null) {
                 init();
-
             }
         }
 
@@ -94,42 +95,34 @@ public class DownLoadService extends Service {
      * 获取源id 默认easou
      */
     private void init() {
+        new Thread(new Runnable() {
 
-        String url = UrlUtil.RESOURCE_LIST + bookId;
-
-        StringRequest jrTocs = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
+            @Override
+            public void run() {
+                String bookBriefUrl = UrlUtil.RESOURCE_LIST + bookId;
+                TatansHttp http = new TatansHttp();
+                http.addHeader("User-Agent",
+                        "ZhuiShuShenQi/3.30.2(Android 5.1.1; TCL TCL P590L / TCL TCL P590L; )");
+                http.get(bookBriefUrl, new HttpRequestCallBack<String>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onSuccess(String result) {
+                        super.onSuccess(result);
                         /** 目錄写入.TXT文件保存 */
-                        FileUtil.write(response.toString(),
+                        FileUtil.write(result.toString(),
                                 UrlUtil.SOURCE_LIST_TXT, bookId, 0);
-                        AnalyzeTocs(response.toString());
-
+                        AnalyzeTocs(result.toString());
                     }
 
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("error", error + "");
-                showToast("未能请求到数据，请检查网络");
-                stopSelf();
+                    @Override
+                    public void onFailure(Throwable t, String strMsg) {
+                        HttpProces.failHttp();
+                        showToast("未能获取到资源列表，请检查网络");
+
+                    }
+                });
             }
-        }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/json");
-                headers.put("charset", "utf-8");
-                headers.put("User-Agent",
-                        "ZhuiShuShenQi/3.30.2(Android 5.1.1; TCL TCL P590L / TCL TCL P590L; )");
-                // "application/x-javascript");
-                // headers.put("Content-Type",
-                // headers.put("Accept-Encoding", "gzip");
-                return headers;
-            }
-        };
-        mRequestQueue.add(jrTocs);
+
+        }).start();
     }
 
     /**
@@ -202,8 +195,14 @@ public class DownLoadService extends Service {
         }
     }
 
-    private void showToast(String text) {
-        TatansToast.showAndCancel(text);
+
+    private void showToast(final String text) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                TatansToast.showAndCancel(text);
+            }
+        });
     }
 
     Handler handler = new Handler();
@@ -264,7 +263,7 @@ public class DownLoadService extends Service {
                             public void onErrorResponse(
                                     VolleyError error) {
                                         /*
-										 * Log.d("MYTAG", j + ""); if (j % 80 ==
+                                         * Log.d("MYTAG", j + ""); if (j % 80 ==
 										 * 0) { send(j, true); } else if
 										 * (chapterlist.size() - 1 == j) {
 										 * send(j, true); }
@@ -314,7 +313,7 @@ public class DownLoadService extends Service {
     // 控制resend方法不死循环，重新发送最多一百次
 
 	/*
-	 * Runnable downLoadChapters = new Runnable() {
+     * Runnable downLoadChapters = new Runnable() {
 	 * 
 	 * @Override public void run() { downLoadChapters(); } };
 	 */
