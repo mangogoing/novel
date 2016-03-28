@@ -76,13 +76,14 @@ public class DownLoadService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand");
+        Log.d("IIIIIIIIII", System.currentTimeMillis() +"");
         if (intent != null) {
             chapterlist.clear();
             bookId = intent.getStringExtra("bookId");
             title = intent.getStringExtra("title");
             sourceNum = Integer.parseInt(intent.getStringExtra("source"));
             mRequestQueue = Volley.newRequestQueue(this);
-            showToast("准备缓存");
+            showToast("开始缓存"+title);
             if (bookId != null) {
                 init();
             }
@@ -95,44 +96,84 @@ public class DownLoadService extends Service {
      * 获取源id 默认easou
      */
     private void init() {
-        new Thread(new Runnable() {
+        String url = UrlUtil.RESOURCE_LIST + bookId;
 
-            @Override
-            public void run() {
-                String bookBriefUrl = UrlUtil.RESOURCE_LIST + bookId;
-                TatansHttp http = new TatansHttp();
-                http.addHeader("User-Agent",
-                        "ZhuiShuShenQi/3.30.2(Android 5.1.1; TCL TCL P590L / TCL TCL P590L; )");
-                http.get(bookBriefUrl, new HttpRequestCallBack<String>() {
+        StringRequest jrTocs = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
                     @Override
-                    public void onSuccess(String result) {
-                        super.onSuccess(result);
+                    public void onResponse(final String response) {
                         /** 目錄写入.TXT文件保存 */
-                        FileUtil.write(result.toString(),
+                    new Thread(new Runnable() {
+                        @Override
+                       public void run() {
+                        FileUtil.write(response.toString(),
                                 UrlUtil.SOURCE_LIST_TXT, bookId, 0);
-                        AnalyzeTocs(result.toString());
-                    }
+                             }
+                    }).start();
 
-                    @Override
-                    public void onFailure(Throwable t, String strMsg) {
-                        HttpProces.failHttp();
-                        showToast("未能获取到资源列表，请检查网络");
+                        AnalyzeTocs(response.toString());
 
                     }
-                });
+
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("error", error + "");
+                showToast("未能获取到资源列表，请检查网络");
             }
-
-        }).start();
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/json");
+                headers.put("charset", "utf-8");
+                headers.put("User-Agent",
+                        "ZhuiShuShenQi/3.30.2(Android 5.1.1; TCL TCL P590L / TCL TCL P590L; )");
+                // "application/x-javascript");
+                // headers.put("Content-Type",
+                // headers.put("Accept-Encoding", "gzip");
+                return headers;
+            }
+        };
+        mRequestQueue.add(jrTocs);
+//        new Thread(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                String bookBriefUrl = UrlUtil.RESOURCE_LIST + bookId;
+//                TatansHttp http = new TatansHttp();
+//                http.addHeader("User-Agent",
+//                        "ZhuiShuShenQi/3.30.2(Android 5.1.1; TCL TCL P590L / TCL TCL P590L; )");
+//                http.get(bookBriefUrl, new HttpRequestCallBack<String>() {
+//                    @Override
+//                    public void onSuccess(String result) {
+//                        super.onSuccess(result);
+//                        /** 目錄写入.TXT文件保存 */
+//                        FileUtil.write(result.toString(),
+//                                UrlUtil.SOURCE_LIST_TXT, bookId, 0);
+//                        AnalyzeTocs(result.toString());
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Throwable t, String strMsg) {
+//                        HttpProces.failHttp();
+//                        showToast("未能获取到资源列表，请检查网络");
+//
+//                    }
+//                });
+//            }
+//
+//        }).start();
     }
 
     /**
      * 获取章节列表
      */
     private void AnalyzeTocs(final String string) {
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
+//        new Thread(new Runnable() {
+//
+//            @Override
+//            public void run() {
                 List<SummaryDto> summarylist = JsonUtils.getSummaryListByJson(string);
                 if (summarylist.size() > 0) {
                     if (sourceNum > summarylist.size() - 1) {
@@ -145,12 +186,15 @@ public class DownLoadService extends Service {
                 StringRequest jrChapterLists = new StringRequest(Request.Method.GET,
                         viewChaptersUrl, new Response.Listener<String>() {
                     @Override
-                    public void onResponse(String response) {
-                        System.out.println(response);
-                        System.out.println(viewChaptersUrl);
+                    public void onResponse(final String response) {
                         /** 目錄写入.TXT文件保存 */
-                        FileUtil.write(response.toString(),
-                                UrlUtil.CHAPTERLIST_TXT, bookId, sourceNum);
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                FileUtil.write(response.toString(),
+                                        UrlUtil.CHAPTERLIST_TXT, bookId, sourceNum);
+                            }
+                        }).start();
                         downLoadChapters(response);
                     }
 
@@ -173,9 +217,9 @@ public class DownLoadService extends Service {
 
                 };
                 mRequestQueue.add(jrChapterLists);
-            }
-
-        }).start();
+//            }
+//
+//        }).start();
     }
 
     @Override
@@ -207,18 +251,14 @@ public class DownLoadService extends Service {
 
     Handler handler = new Handler();
 
+
+
     // 開啟volley网络下載章節內容
     public void downLoadChapters(String response) {
         JSONObject json;
         try {
             json = new JSONObject(response);
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    TatansToast.showAndCancel("开始缓存:" + title);
-                }
-            });
-
+            Log.d("IIIIIIIIII", System.currentTimeMillis() +"");
             JSONArray array;
             try {
                 array = json.getJSONArray("chapters");
@@ -246,15 +286,21 @@ public class DownLoadService extends Service {
                                 new Response.Listener<JSONObject>() {
 
                                     @Override
-                                    public void onResponse(JSONObject response) {
-                                        FileUtil.write(response.toString(), j,
-                                                bookId, sourceNum);
+                                    public void onResponse(final JSONObject response) {
+                                        new Thread(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                FileUtil.write(response.toString(), j,
+                                                        bookId, sourceNum);
+                                                send(j, true);
+                                            }
+                                        }).start();
                                         /*
                                          * if (j % 80 == 0) { send(j, true); }
 										 * else if (chapterlist.size() - 1 == j)
 										 * { send(j, true); }
 										 */
-                                        send(j, true);
+
 
                                     }
                                 }, new Response.ErrorListener() {
@@ -268,8 +314,12 @@ public class DownLoadService extends Service {
 										 * (chapterlist.size() - 1 == j) {
 										 * send(j, true); }
 										 */
-                                send(j, true);
-
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        send(j, true);
+                                    }
+                                }).start();
                             }
                         });
                         jr.setTag("NOVEL_REQUEST");

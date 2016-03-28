@@ -12,10 +12,10 @@ import android.widget.TextView;
 
 import com.umeng.analytics.MobclickAgent;
 
+import net.tatans.coeus.network.tools.TatansToast;
 import net.tatans.coeus.novel.R;
 import net.tatans.coeus.novel.adapter.MainAdapter;
 import net.tatans.coeus.novel.base.BaseActivity;
-import net.tatans.coeus.speaker.Speaker;
 import net.tatans.coeus.speech.util.NetWorkUtil;
 
 import java.util.ArrayList;
@@ -26,7 +26,6 @@ public class MainActivity extends BaseActivity implements OnItemClickListener {
 	private ListView lv_main;
 	private TextView tx_disclaimer, tv_local;
 	private MainAdapter listAdapter;
-	private Speaker speaker;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -35,7 +34,6 @@ public class MainActivity extends BaseActivity implements OnItemClickListener {
 		lv_main = (ListView) findViewById(R.id.lv_novel_mian);
 		tx_disclaimer = (TextView) findViewById(R.id.tx_disclaimer);
 		tv_local = (TextView) findViewById(R.id.tv_local);
-		speaker = Speaker.getInstance(getApplicationContext());
 		setTitle("天坦小说");
 		mainList = new ArrayList<String>();
 		mainList.add("搜索");
@@ -92,9 +90,7 @@ public class MainActivity extends BaseActivity implements OnItemClickListener {
 			startActivity(intent);
 		} else {
 			if (!NetWorkUtil.hasNetworkConnection(MainActivity.this)) {
-				if (speaker != null) {
-					speaker.speech("当前网络未连接，请检查网络");
-				}
+				TatansToast.showAndCancel("当前网络未连接，请检查网络。");
 				return;
 			}
 			switch (position) {

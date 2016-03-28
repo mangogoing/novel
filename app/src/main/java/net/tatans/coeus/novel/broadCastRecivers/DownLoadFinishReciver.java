@@ -15,6 +15,7 @@ import net.tatans.coeus.novel.tools.NetworkUtils;
 import net.tatans.coeus.novel.tools.UrlUtil;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DownLoadFinishReciver extends BroadcastReceiver {
@@ -90,8 +91,13 @@ public class DownLoadFinishReciver extends BroadcastReceiver {
                     TatansToast.showAndCancel(item.getTitle() + " 缓存完成");
                 }
             }
-            List<CollectorDto> CollectorDtoList = db.findAllByWhere(
+            List<CollectorDto> CollectorDtoList = new ArrayList<>();
+            List<CollectorDto> CollectorDtoList1 = db.findAllByWhere(
                     CollectorDto.class, " isDownLoad ==2 ", " date ");
+            List<CollectorDto> CollectorDtoList2 = db.findAllByWhere(
+                    CollectorDto.class, " isDownLoad ==0 ", " date ");
+            CollectorDtoList.addAll(CollectorDtoList1);
+            CollectorDtoList.addAll(CollectorDtoList2);
             // 把第一个等待缓存的改为正在下载
             if (CollectorDtoList.size() != 0) {
                 CollectorDto firstItem = CollectorDtoList.get(0);

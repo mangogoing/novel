@@ -22,7 +22,7 @@
         android:layout_height="180dp"
         android:layout_weight="1"
         android:padding="10dp"
-        android:text="加载中,若长时间没有获取到数据，请检查网络"
+        android:text="正在请求内容，请稍后"
         android:textColor="@color/white"
         android:textSize="25sp" />
 

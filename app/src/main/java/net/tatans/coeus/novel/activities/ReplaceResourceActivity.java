@@ -75,8 +75,13 @@ public class ReplaceResourceActivity extends BaseActivity implements
         title = intent.getStringExtra("title");
         setTitle(title + "资源列表");
         lv_one_list.setOnItemClickListener(this);
-        String source = db.findById(bookId, CollectorDto.class)
-                .getSource();
+        String source;
+        try {
+            source = db.findById(bookId, CollectorDto.class)
+                    .getSource();
+        } catch (NullPointerException e) {
+            source = "0";
+        }
         sourceNum = Integer.parseInt(source);
         init();
 

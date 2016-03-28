@@ -37,7 +37,7 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
     private int totalChapterCount;
     private String bookId;
     public TatansDb db;
-    private String source = "0";
+    private String source;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +47,12 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
         setTitle("更多");
         initView();
         initdata();
-        source = db.findById(bookId, CollectorDto.class)
-                .getSource();
+        try {
+            source = db.findById(bookId, CollectorDto.class)
+                    .getSource();
+        } catch (NullPointerException e) {
+            source = "0";
+        }
         // new myAsycTesk().execute();
     }
 

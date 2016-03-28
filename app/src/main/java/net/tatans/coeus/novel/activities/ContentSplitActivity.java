@@ -717,17 +717,18 @@ public class ContentSplitActivity extends BaseActivity {
         public void onCallStateChanged(int state, String incomingNumber) {
             switch (state) {
                 case TelephonyManager.CALL_STATE_IDLE: // 挂机状态
-                    if (speaker != null && isSpeaking) {
-                        speaker.resume();
-
-                    }
+//                    if (speaker != null && isSpeaking) {
+//                        speaker.resume();
+//
+//                    }
                     break;
                 case TelephonyManager.CALL_STATE_OFFHOOK: // 通话状态
 
                 case TelephonyManager.CALL_STATE_RINGING: // 响铃状态
-                    if (speaker != null && isSpeaking) {
-                        speaker.pause();
-                    }
+//                    if (speaker != null && isSpeaking) {
+//                        speaker.pause();
+//                    }
+                    speakPause();
                     break;
                 default:
                     break;

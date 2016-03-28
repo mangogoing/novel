@@ -54,7 +54,7 @@ public class ChapterListActivity extends BaseActivity implements
     private ListView lv_one_list;
     private TextView tv_loading;
     private TitleAdapter listAdapter;
-    private String title, chapterFilePath,sourceFilePath;
+    private String title, chapterFilePath, sourceFilePath;
     private int isDownLoad;
     private List<String> titleList = new ArrayList<String>();
     private List<Integer> sortList = new ArrayList<Integer>();
@@ -83,9 +83,14 @@ public class ChapterListActivity extends BaseActivity implements
                 .getBooleanExtra("BookBriefActivity", false);
         title = intent.getStringExtra("title");
         setTitle(title + "章节列表");
-        String source = db.findById(bookId, CollectorDto.class)
-                .getSource();
-        sourceNum =Integer.parseInt(source);
+        String source;
+        try {
+            source = db.findById(bookId, CollectorDto.class)
+                    .getSource();
+        } catch (NullPointerException e) {
+            source = "0";
+        }
+        sourceNum = Integer.parseInt(source);
         init();
         lv_one_list.setOnItemClickListener(this);
 
@@ -190,40 +195,40 @@ public class ChapterListActivity extends BaseActivity implements
 
             @Override
             public void run() {
-            InputStream urlStream = null;
-            BufferedReader reader = null;
-            String result = "";
-            try {
-                HttpURLConnection cumtConnection = (HttpURLConnection) new URL(
-                        UrlUtil.RESOURCE_BOOK_ID + newBookId
-                                + "?view=chapters").openConnection();
-                cumtConnection.setRequestProperty("User-Agent",
-                        "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
-                urlStream = cumtConnection.getInputStream();
-                reader = new BufferedReader(
-                        new InputStreamReader(urlStream, "UTF-8"));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    result = result + line;
-                }
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
+                InputStream urlStream = null;
+                BufferedReader reader = null;
+                String result = "";
                 try {
-                    reader.close();
-                    urlStream.close();
+                    HttpURLConnection cumtConnection = (HttpURLConnection) new URL(
+                            UrlUtil.RESOURCE_BOOK_ID + newBookId
+                                    + "?view=chapters").openConnection();
+                    cumtConnection.setRequestProperty("User-Agent",
+                            "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
+                    urlStream = cumtConnection.getInputStream();
+                    reader = new BufferedReader(
+                            new InputStreamReader(urlStream, "UTF-8"));
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        result = result + line;
+                    }
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
                 } catch (Exception e) {
                     e.printStackTrace();
+                } finally {
+                    try {
+                        reader.close();
+                        urlStream.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
+                titleList = JsonUtils.getChapterNameListByJson(result);
+                for (int i = 0; i < titleList.size(); i++) {
+                    sortList.add(i + 1);
+                }
+                handler.post(result2json);
             }
-            titleList = JsonUtils.getChapterNameListByJson(result);
-            for (int i = 0; i < titleList.size(); i++) {
-                sortList.add(i + 1);
-            }
-            handler.post(result2json);
-          }
 
         }).start();
 

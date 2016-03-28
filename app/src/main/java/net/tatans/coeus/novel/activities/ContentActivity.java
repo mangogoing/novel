@@ -70,8 +70,13 @@ public class ContentActivity extends ContentSplitActivity {
     }
 
     private void init() {
-        source = db.findById(bookId, CollectorDto.class)
-                .getSource();
+        try {
+            source = db.findById(bookId, CollectorDto.class)
+                    .getSource();
+        }catch (NullPointerException e){
+            source = "0";
+        }
+
         sourceNum = Integer.parseInt(source);
         sourceFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.SOURCE_LIST_TXT, 0);
         if (isDownLoad == 1 && FileUtil.fileIsExists(sourceFilePath)

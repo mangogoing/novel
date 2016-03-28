@@ -38,11 +38,12 @@ import java.util.Map;
 public class CollectorAdapter extends BaseAdapter {
     private List<CollectorDto> CollectorList;
     private List<CollectorDto> list;
+    private ProgressDialog proDia;
     // 章节更新map
     Map<String, Integer> map = new HashMap<String, Integer>();
     private Context context;
-    Handler handler = new Handler();
     private boolean isDelete = true;
+    Handler handler = new Handler();
     /**
      * page暂时无用，本可做分页处理，但已在activity做了
      */
@@ -52,7 +53,7 @@ public class CollectorAdapter extends BaseAdapter {
     private String dailog = "";
 
     public CollectorAdapter(List<CollectorDto> list, Context context,
-                            float pageSize, int currentPage, Map<String, Integer> map) {
+                            float pageSize, int currentPage, Map<String, Integer> map, ProgressDialog proDia) {
 
         super();
         this.map = map;
@@ -60,6 +61,7 @@ public class CollectorAdapter extends BaseAdapter {
         this.context = context;
         this.pageSize = pageSize;
         this.currentPage = currentPage;
+        this.proDia = proDia;
         init();
     }
 
@@ -165,9 +167,6 @@ public class CollectorAdapter extends BaseAdapter {
             // 删除
             @Override
             public void onClick(View v) {
-                final ProgressDialog proDia = new ProgressDialog(context);
-                proDia.setTitle("移除中");
-                proDia.setCancelable(false);
                 proDia.show();
                 try {
                     if (isDelete) {
@@ -189,33 +188,35 @@ public class CollectorAdapter extends BaseAdapter {
                             dailog = "取消下载并";
                             startDownLoadNext();
                         }
-//                        new Thread(new Runnable() {
-//                            public void run() {
+                        new Thread(new Runnable() {
+                            public void run() {
                         FileUtil.delete(file);
-//                            }
-//                        }).start();
+                            }
+                        }).start();
 
 
                         db.delete(item);
                         list.remove(item);
                         CollectorActivity.pageCount = (int) Math.ceil(list.size()
                                 / AppConstants.APP_PAGE_SIZE);
-                        init();
-                        if (list.size() == 0) {
-                            Activity activity = (Activity) context;
-                            activity.finish();
-                        } else if (CollectorList.size() == 0 && currentPage != 1) {
-                            currentPage--;
-                            init();
-                            handler.postDelayed(flush, 10);
-                        } else if (list.size() <= pageSize) {
-                            currentPage = 1;
-                            init();
-                            handler.postDelayed(flush, 10);
-                        } else {
-                            init();
-                            handler.postDelayed(flush, 10);
-                        }
+                        CollectorList = list;
+//                    if (list.size() == 0) {
+//                        handler.postDelayed(flushFinsh, 10);
+//                    } else {
+                        handler.postDelayed(flush, 10);
+//                    }
+//                  else if (CollectorList.size() == 0 && currentPage != 1) {
+//                            currentPage--;
+//                            init();
+//                            handler.postDelayed(flush, 10);
+//                        } else if (list.size() <= pageSize) {
+//                            currentPage = 1;
+//                            init();
+//                            handler.postDelayed(flush, 10);
+//                        } else {
+//                            init();
+
+//                        }
                     }
 
                 } catch (Exception e) {
@@ -227,7 +228,7 @@ public class CollectorAdapter extends BaseAdapter {
                             proDia.dismiss();
                             TatansToast.showAndCancel(title + dailog + "移除成功");
                         }
-                    }, 1000);
+                    }, 2000);
                 }
             }
         });
@@ -243,15 +244,6 @@ public class CollectorAdapter extends BaseAdapter {
         return convertView;
     }
 
-    Runnable flush = new Runnable() {
-
-        @Override
-        public void run() {
-            notifyDataSetChanged();
-            handler.postDelayed(isDelay, 1000);
-        }
-    };
-
     Runnable isDelay = new Runnable() {
 
         @Override
@@ -259,6 +251,16 @@ public class CollectorAdapter extends BaseAdapter {
             isDelete = true;
         }
     };
+
+    Runnable flush = new Runnable() {
+
+        @Override
+        public void run() {
+            notifyDataSetChanged();
+            handler.postDelayed(isDelay, 2000);
+        }
+    };
+
 
     public class send implements Runnable {
         String _id;
