@@ -68,7 +68,7 @@ public class ContentSplitActivity extends BaseActivity {
     protected Speaker appSpeaker;
     private static String NEXT = "下一页";
     private String PRE = "上一页";
-    protected static net.tatans.coeus.speaker.Speaker speaker = null;
+    protected net.tatans.coeus.speaker.Speaker speaker;
     private int flag;// 用来标记是下一条还是下一页
     private HomeWatcher mHomeWatcher = null;
     // 音频焦点控制
@@ -280,6 +280,7 @@ public class ContentSplitActivity extends BaseActivity {
         }
     }
 
+    private boolean isHourly;
     /**
      * 音频控制
      */
@@ -293,6 +294,8 @@ public class ContentSplitActivity extends BaseActivity {
                         ContentSplitActivity.this).isSpeaking()) {
                     net.tatans.coeus.speaker.Speaker.getInstance(
                             ContentSplitActivity.this).pause();
+                    Log.d("radio", "onFocusLossTransient---PAUSE");
+                    isHourly = true;
                     speaker.pause();
                 }
             }
@@ -327,7 +330,15 @@ public class ContentSplitActivity extends BaseActivity {
                 Log.d("radio", "onFocusGain");
                 net.tatans.coeus.speaker.Speaker.getInstance(
                         ContentSplitActivity.this).resume();
-                speaker.resume();
+                if(isHourly){
+                    isHourly = false;
+                    sentenceIndex--;
+                    readNextSentence();
+                }else{
+                    speaker.resume();
+                }
+
+//                readNextSentence();
             }
         };
         mAudioManagerUtil = new AudioManagerUtil(getApplicationContext(),
@@ -684,6 +695,7 @@ public class ContentSplitActivity extends BaseActivity {
         super.onDestroy();
         if (speaker != null) {
             speaker.stop();
+
             speaker.setOnSpeechCompletionListener(null);
             speaker = null;
         }
