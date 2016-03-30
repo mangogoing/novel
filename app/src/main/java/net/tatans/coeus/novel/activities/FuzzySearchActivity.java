@@ -62,7 +62,7 @@ public class FuzzySearchActivity extends BaseActivity implements
 	private ArrayAdapter<String> arrayAdapter;
 	private List<String> array = new ArrayList<String>();
 	private boolean isLoading;
-	private String inputText;
+	private String inputText = "";
 	private boolean isOnItemClick;
 
 	@Override
@@ -378,13 +378,14 @@ public class FuzzySearchActivity extends BaseActivity implements
 			if (ok.equals("true")) {
 				JSONArray arrayBooks = json.getJSONArray("books");
 				int lenght = arrayBooks.length();
-				if (lenght == 0) {
-					showToast("没有找到" + name + "相关的小说");
-					return;
-				}
 				isSearch = true;
 				searchList.clear();
 				ClassificatList.clear();
+				if (lenght == 0) {
+					handler.post(result2json);
+					showToast("没有找到" + name + "相关的小说");
+					return;
+				}
 				/* 不能在for循环之外new一个对象，这会造成添加到List中的为同一个对象 */
 				BookListDto cTwoDto = null;
 				for (int i = 0; i < lenght; i++) {
@@ -421,6 +422,7 @@ public class FuzzySearchActivity extends BaseActivity implements
 
 				handler.post(result2json);
 			} else {
+				handler.post(result2json);
 				showToast("没有找到" + name + "相关的小说");
 			}
 		} catch (Exception e) {
@@ -438,10 +440,10 @@ public class FuzzySearchActivity extends BaseActivity implements
 	};
 
 	public void setListData() {
-		if (searchList.size() == 0) {
-			return;
-		}
-		if (isSearch) {
+//		if (searchList.size() == 0) {
+//			return;
+//		}
+		if (isSearch&&searchList.size() != 0) {
 			showToast("已经为您找到" + searchList.size() + "本与"
 					+ av_autotext.getText() + "相关的小说");
 			isSearch = false;
