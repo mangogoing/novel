@@ -92,6 +92,8 @@ public class FuzzySearchActivity extends BaseActivity implements
 				inputText = str;
 				if (!isLoading) {
 					tv_loading.setVisibility(View.VISIBLE);
+					InputMethodlUtil.hideInputMethod(FuzzySearchActivity.this,
+							av_autotext);
 					new searchAsycTesk().execute();
 				}
 			}
@@ -319,6 +321,7 @@ public class FuzzySearchActivity extends BaseActivity implements
 							@Override
 							public void onSuccess(String arg0) {
 								super.onSuccess(arg0);
+								isLoading = false;
 								handler.post(flushUi2);
 								json2Gson(arg0, inputText);
 							}

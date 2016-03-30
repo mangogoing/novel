@@ -148,6 +148,10 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
                 download(collerctor);
                 break;
             case R.id.ll_replace_resource:
+                if (!NetWorkUtil.hasNetworkConnection(MoreActivity.this)) {
+                    TatansToast.showAndCancel("当前网络未连接，请检查网络。");
+                    return;
+                }
                 if (isDownLoad != 3) {
                     Intent intentReplace = new Intent();
                     intentReplace.setClass(MoreActivity.this,
