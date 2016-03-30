@@ -131,26 +131,26 @@ public class CollectorAdapter extends BaseAdapter {
                     String Tag = ": " + (double) convertView.getTag() + "%已缓存";
                     text = text + Tag;
                 }
-                imageView.setContentDescription("取消緩存" + title + "。");
+                imageView.setContentDescription("取消緩存" + title );
                 status.setImageResource(R.drawable.down_loading);
                 status.setContentDescription("下载中");
             } else if (collcetor.getIsDownLoad() == 2) {
                 // 若为列队下载
                 text = text + ": 等待缓存中";
-                imageView.setContentDescription("取消緩存" + title + "。");
+                imageView.setContentDescription("取消緩存" + title);
                 status.setImageResource(R.drawable.be_queued);
                 status.setContentDescription("等待中");
             } else if (collcetor.getIsDownLoad() == 1) {
-                imageView.setContentDescription("移除小说" + title + "。");
+                imageView.setContentDescription("移除小说" + title);
                 status.setImageResource(R.drawable.down_loaded);
                 status.setContentDescription("已下载");
             } else if (collcetor.getIsDownLoad() == 3) {
-                imageView.setContentDescription("移除小说" + title + "。");
+                imageView.setContentDescription("移除小说" + title );
                 status.setImageResource(R.drawable.local_file);
                 status.setContentDescription("本地小说");
             } else {
                 // 仅仅收藏过
-                imageView.setContentDescription("取消收藏" + title + "。");
+                imageView.setContentDescription("取消收藏" + title);
                 status.setImageResource(R.drawable.collected);
                 status.setContentDescription("已收藏");
             }

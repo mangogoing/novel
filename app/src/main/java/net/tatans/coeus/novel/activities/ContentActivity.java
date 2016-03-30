@@ -42,6 +42,8 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Yuliang
@@ -52,7 +54,7 @@ import java.util.List;
 public class ContentActivity extends ContentSplitActivity {
     private List<CollectorDto> lt_collector; // 小说的collector list
     private static String TAG = "ContentActivity";
-    private String strContent; // 资讯内容
+    private String strContent = ""; // 资讯内容
     private TatansDb db;
     private String chapterFilePath, sourceFilePath;
     private List<ChapterDto> ChapterList;
@@ -73,7 +75,7 @@ public class ContentActivity extends ContentSplitActivity {
         try {
             source = db.findById(bookId, CollectorDto.class)
                     .getSource();
-        }catch (NullPointerException e){
+        } catch (NullPointerException e) {
             source = "0";
         }
 
@@ -289,30 +291,41 @@ public class ContentActivity extends ContentSplitActivity {
                         e.printStackTrace();
                     }
                 }
-                if (result.equals("")) {
-                    setContent("未能获取到资源，在更多选项中选择其他资源试试吧");
-                } else {
-                    String str = JsonUtils.getNovelContent(result).replaceAll(
-                            " ", "");
-                    str = str.replace("\n", "");
+                String str = JsonUtils.getNovelContent(result).replaceAll(
+                        " ", "");
+                str = str.replace("\n", "");
+                if (isContainChinese(str) && !str.equals("")) {
                     strContent = (currentPosition + 1) + "。"
-                            + ChapterList.get(currentPosition).getTitle() + "。"
-                            + "\n正文：" + str;
-
-                    if (isCollector) {
-                        isCollector = false;
-                    } else {
-                        countPage = 0;
-                        sentenceIndex = -1;
-                        position = 0;
-                    }
-
-                    setContent(strContent);
+                            + ChapterList.get(currentPosition).getTitle() + "：" + "\n正文："
+                            + str;
+                } else {
+                    strContent = "未能获取到资源，在更多选项中选择其他资源试试吧";
+                    countPage = 0;
+                    sentenceIndex = -1;
+                    position = 0;
                 }
+                if (isCollector) {
+                    isCollector = false;
+                } else {
+                    countPage = 0;
+                    sentenceIndex = -1;
+                    position = 0;
+                }
+                setContent(strContent);
             }
 
         }).start();
 
+    }
+
+    private boolean isContainChinese(String str) {
+
+        Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
+        Matcher m = p.matcher(str);
+        if (m.find()) {
+            return true;
+        }
+        return false;
     }
 
     // 从sd卡读取数据并解析显示
@@ -337,7 +350,7 @@ public class ContentActivity extends ContentSplitActivity {
             if (!strContent.equals("")) {
                 setContent(strContent);
             } else {
-                setContent("小说内容出错，建议删除重新下载该资源");
+                setContent("小说内容出错，建议换源重新下载该资源");
             }
         }
 
@@ -348,9 +361,12 @@ public class ContentActivity extends ContentSplitActivity {
         if (isDownLoad != 3) {
             String str = JsonUtils.getNovelContent(result).replaceAll(" ", "");
             str = str.replace("\n", "");
-            strContent = (currentPosition + 1) + "。"
-                    + ChapterList.get(currentPosition).getTitle() + "：" + "\n正文："
-                    + str;
+            if (isContainChinese(str)) {
+                strContent = (currentPosition + 1) + "。"
+                        + ChapterList.get(currentPosition).getTitle() + "：" + "\n正文："
+                        + str;
+            }
+
         } else {
             String mResult = result.replace(" ", "");
             String mmResult = mResult.replace("\n", "");

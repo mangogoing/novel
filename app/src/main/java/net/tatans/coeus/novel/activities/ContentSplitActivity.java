@@ -113,6 +113,7 @@ public class ContentSplitActivity extends BaseActivity {
         countPage = intent.getIntExtra("countPage", 0);
         sentenceIndex = intent.getIntExtra("sentenceIndex", -1);
         position = intent.getIntExtra("position", 0);
+
     }
 
     @Override
@@ -259,7 +260,6 @@ public class ContentSplitActivity extends BaseActivity {
                     if (sentenceIndex >= split.length) {
                         speaker.setOnSpeechCompletionListener(null);
                     } else {
-                        Log.d("QQQQQQQQ", "listener");
                         readNextSentence();
                     }
                 }
@@ -410,7 +410,6 @@ public class ContentSplitActivity extends BaseActivity {
                     Log.i(TAG, "nextSplit[1]:" + nextSplit[1]);
                     sentenceIndex = map.get(nextSplit[1]);
                     if ("暂停".equals(pause_or_play.getText().toString())) {
-                        Log.d("QQQQQQQQ", "上一页");
                         readNextSentence();
                     }
                 }
@@ -446,7 +445,6 @@ public class ContentSplitActivity extends BaseActivity {
                         nextInformation();
                     }
                     if ("暂停".equals(pause_or_play.getText().toString())) {
-                        Log.d("QQQQQQQQ", "下一页");
                         readNextSentence();
                     }
                 }
