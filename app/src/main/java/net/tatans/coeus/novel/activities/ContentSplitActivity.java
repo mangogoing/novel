@@ -250,6 +250,7 @@ public class ContentSplitActivity extends BaseActivity {
 
             @Override
             public void onHomeLongPressed() {
+                speakPause();
             }
         });
         listener = new onSpeechCompletionListener() {
@@ -281,6 +282,7 @@ public class ContentSplitActivity extends BaseActivity {
     }
 
     private boolean isHourly;
+
     /**
      * 音频控制
      */
@@ -337,7 +339,8 @@ public class ContentSplitActivity extends BaseActivity {
                 }else{
                     speaker.resume();
                 }
-
+                speaker.resume();
+                isSpeaking = true;
 //                readNextSentence();
             }
         };
@@ -769,13 +772,18 @@ public class ContentSplitActivity extends BaseActivity {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                speaker.resume();
+                if(speaker==null){
+                    speaker = net.tatans.coeus.speaker.Speaker
+                            .getInstance(ContentSplitActivity.this);
+                }
                 isSpeaking = true;
                 mAudioManagerUtil.requestAudioFocus();
-                net.tatans.coeus.speaker.Speaker.getInstance(ContentSplitActivity.this)
-                        .resume();
+//                net.tatans.coeus.speaker.Speaker.getInstance(ContentSplitActivity.this)
+//                        .resume();
                 pause_or_play.setText("暂停");
                 pause_or_play.setContentDescription("暂停。按钮");
+                sentenceIndex--;
+                readNextSentence();
             }
         });
     }
