@@ -129,24 +129,24 @@ public class ContentSplitActivity extends BaseActivity {
     @Override
     public void up() {
         if ("暂停".equals(pause_or_play.getText().toString())) {
-            appSpeaker.speech("暂停播放");
+//            appSpeaker.speech("暂停播放");
             speakPause();
         } else {
             if (isComplete) {
                 speaker.speech("本章内容已读完");
                 return;
             }
-            appSpeaker.speech("继续播放", new Callback() {
-                @Override
-                public void onStart() {
-                    super.onStart();
-                }
-
-                @Override
-                public void onDone() {
-                    speakResume();
-                }
-            });
+//            appSpeaker.speech("继续播放", new Callback() {
+//                @Override
+//                public void onStart() {
+//                    super.onStart();
+//                }
+//
+//                @Override
+//                public void onDone() {
+            speakResume();
+//                }
+//            });
         }
     }
 
@@ -332,11 +332,11 @@ public class ContentSplitActivity extends BaseActivity {
                 Log.d("radio", "onFocusGain");
                 net.tatans.coeus.speaker.Speaker.getInstance(
                         ContentSplitActivity.this).resume();
-                if(isHourly){
+                if (isHourly) {
                     isHourly = false;
                     sentenceIndex--;
                     readNextSentence();
-                }else{
+                } else {
                     speaker.resume();
                 }
                 speaker.resume();
@@ -665,7 +665,7 @@ public class ContentSplitActivity extends BaseActivity {
     public void preInformation() {
         Log.d(TAG, "上一章");
 
-        speakPause();
+        speakPauseNoTips();
         isComplete = false;
     }
 
@@ -674,7 +674,7 @@ public class ContentSplitActivity extends BaseActivity {
      */
     public void nextInformation() {
         Log.d(TAG, "下一章");
-        speakPause();
+        speakPauseNoTips();
         isComplete = false;
     }
 
@@ -755,6 +755,26 @@ public class ContentSplitActivity extends BaseActivity {
         handler.post(new Runnable() {
             @Override
             public void run() {
+                if (isSpeaking){
+                    showToast("暂停播放");
+                }
+                speaker.pause();
+                // isStops = false;
+                isSpeaking = false;
+                mAudioManagerUtil.abandonAudioFocus();
+                net.tatans.coeus.speaker.Speaker.getInstance(ContentSplitActivity.this)
+                        .pause();
+                pause_or_play.setText("播放");
+                pause_or_play.setContentDescription("播放。按钮");
+            }
+        });
+
+    }
+
+    private void speakPauseNoTips() {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
                 speaker.pause();
                 // isStops = false;
                 isSpeaking = false;
@@ -772,7 +792,8 @@ public class ContentSplitActivity extends BaseActivity {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                if(speaker==null){
+                showToast("继续播放");
+                if (speaker == null) {
                     speaker = net.tatans.coeus.speaker.Speaker
                             .getInstance(ContentSplitActivity.this);
                 }
