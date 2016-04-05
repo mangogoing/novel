@@ -334,7 +334,7 @@ public class ContentSplitActivity extends BaseActivity {
                         ContentSplitActivity.this).resume();
                 if (isHourly) {
                     isHourly = false;
-                    sentenceIndex--;
+//                    sentenceIndex--;
                     readNextSentence();
                 } else {
                     speaker.resume();
@@ -803,7 +803,7 @@ public class ContentSplitActivity extends BaseActivity {
 //                        .resume();
                 pause_or_play.setText("暂停");
                 pause_or_play.setContentDescription("暂停。按钮");
-                sentenceIndex--;
+//                sentenceIndex--;
                 readNextSentence();
             }
         });
