@@ -118,12 +118,12 @@ public class ContentSplitActivity extends BaseActivity {
 
     @Override
     public void left() {
-
+        leftHandler();
     }
 
     @Override
     public void right() {
-
+        rightHandler();
     }
 
     @Override
