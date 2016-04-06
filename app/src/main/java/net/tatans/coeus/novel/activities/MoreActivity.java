@@ -1,9 +1,7 @@
 package net.tatans.coeus.novel.activities;
 
 import android.annotation.SuppressLint;
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
-import android.content.Context;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,15 +22,13 @@ import net.tatans.coeus.novel.services.DownLoadService;
 import net.tatans.coeus.novel.tools.InputMethodlUtil;
 import net.tatans.coeus.speech.util.NetWorkUtil;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class MoreActivity extends BaseActivity implements OnClickListener {
     private String title;
     private int currentPosition, isDownLoad;
     private EditText input_chapter;
-    private LinearLayout ll_goto, ll_cache, ll_catalog, ll_replace_resource;
+    private LinearLayout ll_goto, ll_cache, ll_catalog, ll_replace_resource, ll_speed;
     private int requestCode = 1;
     private int totalChapterCount;
     private String bookId;
@@ -67,6 +63,8 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
         ll_replace_resource.setOnClickListener(this);
         ll_goto = (LinearLayout) findViewById(R.id.ll_goto);
         ll_goto.setOnClickListener(this);
+        ll_speed = (LinearLayout) findViewById(R.id.ll_speed);
+        ll_speed.setOnClickListener(this);
         input_chapter = (EditText) findViewById(R.id.input_chapter);
         input_chapter.setOnHoverListener(new OnHoverListener() {
 
@@ -167,7 +165,53 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
                 }
 
                 break;
+            case R.id.ll_speed:
+//                Intent intent=new Intent();
+//                intent.setClass(this, VoiceSpeedSettingActivity.class);
+//                startActivity(intent);
+                String sActivityName = "";
+                String sPakName = "";
+//                if (PermissionAdmin.checkSystemPermission(this)) {
+//                    sActivityName = getResources().getString(R.string.defaltSpeedSettingActivty);
+//                    sPakName = getResources().getString(R.string.defaltSpeedSettingPackage);
+//                }
+//                String iflytekPackage = getResources().getString(R.string.iflytekPackage);
+                String YujiPackage = getResources().getString(R.string.YujiPackage);
+//                String XunFeiPackage = getResources().getString(R.string.XunFeiPackage);
+//
+//                if (currentEngine.equals(XunFeiPackage)) {
+//                    sActivityName = getResources().getString(R.string.XunFeiActivty);
+//                    sPakName = getResources().getString(R.string.XunFeiPackage);
+//                    TatansToast.showAndCancel("1");
+//                }
+//                else if (currentEngine.equals(iflytekPackage)) {
+//                    sActivityName = getResources().getString(R.string.iflytekActivty);
+//                    sPakName = getResources().getString(R.string.iflytekPackage);
+//                    TatansToast.showAndCancel("2");
+//                }
+//                else
+//                if (currentEngine.equals(YujiPackage)) {
 
+//                } else {
+//                    TatansToast.showAndCancel("语记应用未安装，请安装语记应用！");
+//                }
+
+
+                //通用语速调节路口
+//                intent.setAction("android.speech.tts.engine.CONFIGURE_ENGINE");
+                sActivityName = getResources().getString(R.string.YujiActivty);
+                sPakName = getResources().getString(R.string.YujiPackage);
+                try {
+                    Intent intent = new Intent();
+                    intent.setComponent(new ComponentName(sPakName, sActivityName));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                } catch (Exception e) {
+                    TatansToast.showAndCancel("语记应用未安装，请安装语记应用！");
+                }
+
+
+                break;
             default:
                 break;
         }

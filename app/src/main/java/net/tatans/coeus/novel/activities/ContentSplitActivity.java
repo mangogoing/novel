@@ -411,7 +411,7 @@ public class ContentSplitActivity extends BaseActivity {
                     // String[] nextSplit = mEditText.getText()
                     // .toString().split("，|。|！|？|；");
                     Log.i(TAG, "nextSplit[1]:" + nextSplit[1]);
-                    sentenceIndex = map.get(nextSplit[1]);
+                    sentenceIndex = map.get(nextSplit[1])-1;
                     if ("暂停".equals(pause_or_play.getText().toString())) {
                         readNextSentence();
                     }
@@ -443,7 +443,7 @@ public class ContentSplitActivity extends BaseActivity {
                     // .toString().split("，|。|！|？|；");
                     try {
                         Log.i(TAG, "nextSplit[1]:" + nextSplit[1]);
-                        sentenceIndex = map.get(nextSplit[1]);
+                        sentenceIndex = map.get(nextSplit[1])-1;
                     } catch (Exception e) {
                         nextInformation();
                     }

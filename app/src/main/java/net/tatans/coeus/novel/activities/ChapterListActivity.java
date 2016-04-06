@@ -55,7 +55,7 @@ public class ChapterListActivity extends BaseActivity implements
     private TextView tv_loading;
     private TitleAdapter listAdapter;
     private String title, chapterFilePath, sourceFilePath;
-    private int isDownLoad;
+    private int isDownLoad,currentPosition;
     private List<String> titleList = new ArrayList<String>();
     private List<Integer> sortList = new ArrayList<Integer>();
     Handler handler = new Handler();
@@ -81,6 +81,7 @@ public class ChapterListActivity extends BaseActivity implements
         isDownLoad = intent.getIntExtra("isDownLoad", -1);
         isBookBriefActivity = intent
                 .getBooleanExtra("BookBriefActivity", false);
+        currentPosition = intent.getIntExtra("currentPosition", 0);
         title = intent.getStringExtra("title");
         setTitle(title + "章节列表");
         String source;
@@ -281,6 +282,7 @@ public class ChapterListActivity extends BaseActivity implements
         }
         listAdapter = new TitleAdapter(getApplicationContext(), titleList);
         lv_one_list.setAdapter(listAdapter);
+        lv_one_list.setSelection(currentPosition);
         lv_one_list.setVisibility(View.VISIBLE);
     }
 

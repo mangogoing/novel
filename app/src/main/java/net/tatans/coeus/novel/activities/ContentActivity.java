@@ -507,6 +507,7 @@ public class ContentActivity extends ContentSplitActivity {
         intentMore.putExtra("title", title);
         intentMore.putExtra("currentPosition", currentPosition);
         intentMore.putExtra("bookId", bookId);
+        intentMore.putExtra("currentPosition", currentPosition);
         intentMore.putExtra("totalChapterCount", totalChapterCount);
         startActivityForResult(intentMore, 1);
     }
