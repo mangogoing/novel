@@ -53,6 +53,9 @@ public class RankListActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.list);
 		id = getIntent().getStringExtra("id");
+		if(id.equals("548e984e5beb6f0458d652aa")){
+			id = "564eb878efe5b8e745508fde";
+		}
 		title = getIntent().getStringExtra("title");
 		setTitle(title);
 		lv_main = (ListView) findViewById(R.id.lv_main);
