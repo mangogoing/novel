@@ -83,7 +83,7 @@ public class ContentActivity extends ContentSplitActivity {
         sourceFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.SOURCE_LIST_TXT, 0);
         if (isDownLoad == 1 && FileUtil.fileIsExists(sourceFilePath)
                 || isDownLoad == 3 && FileUtil.fileIsExists(sourceFilePath)
-                || isDownLoad == 0 && FileUtil.fileIsExists(sourceFilePath)) {
+                || isDownLoad == 0 && FileUtil.fileIsExists(sourceFilePath) || isDownLoad == -1 && FileUtil.fileIsExists(sourceFilePath)) {
             // 如果资源列表txt存在读取资源列表
             new readSummaryListFromSDcard().execute();
 
@@ -143,9 +143,10 @@ public class ContentActivity extends ContentSplitActivity {
 
         filePath = FilePathUtil.getFilePath(bookId, currentPosition, sourceNum);
 
-        if (isDownLoad == 1 && FileUtil.fileIsExists(filePath)
-                || isDownLoad == 3 && FileUtil.fileIsExists(filePath)
-                || isDownLoad == 0 && FileUtil.fileIsExists(filePath)) {
+//        if (isDownLoad == 1 && FileUtil.fileIsExists(filePath)
+//                || isDownLoad == 3 && FileUtil.fileIsExists(filePath)
+//                || isDownLoad == 0 && FileUtil.fileIsExists(filePath)) {
+        if (FileUtil.fileIsExists(filePath)) {
             // 如果不为-1，并且该章节没有漏下则离线阅读
             new readFromSDcard().execute();
         } else {
@@ -235,14 +236,16 @@ public class ContentActivity extends ContentSplitActivity {
                         e.printStackTrace();
                     }
                 }
+
                 if (result.equals("")) {
                     setContent("未能获取到资源，在更多选项中选择其他资源试试吧");
                 } else {
                     try {
                         ChapterList = JsonUtils.getChapterListByJson(result);
                         getContentResource(ChapterList.get(currentPosition)
-                                .getLink());
-
+                                .getLink(), currentPosition, true);
+                        getContentResource(ChapterList.get(currentPosition + 1)
+                                .getLink(), currentPosition + 1, false);
                     } catch (Exception e) {
                         e.printStackTrace();
                         setContent("未能获取到资源，在更多选项中选择其他资源试试吧");
@@ -254,7 +257,7 @@ public class ContentActivity extends ContentSplitActivity {
     }
 
 
-    private void getContentResource(final String link) {
+    private void getContentResource(final String link, final int chapterPosition, final boolean isFirst) {
         new Thread(new Runnable() {
 
             @Override
@@ -279,6 +282,8 @@ public class ContentActivity extends ContentSplitActivity {
                     while ((line = reader.readLine()) != null) {
                         result = result + line;
                     }
+                    FileUtil.write(result, chapterPosition,
+                            bookId, sourceNum);
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
@@ -291,27 +296,30 @@ public class ContentActivity extends ContentSplitActivity {
                         e.printStackTrace();
                     }
                 }
-                String str = JsonUtils.getNovelContent(result).replaceAll(
-                        " ", "");
-                str = str.replace("\n", "");
-                if (isContainChinese(str) && !str.equals("")) {
-                    strContent = (currentPosition + 1) + "。"
-                            + ChapterList.get(currentPosition).getTitle() + "：" + "\n正文："
-                            + str;
-                } else {
-                    strContent = "未能获取到资源，在更多选项中选择其他资源试试吧";
-                    countPage = 0;
-                    sentenceIndex = -1;
-                    position = 0;
+                if (isFirst) {
+                    String str = JsonUtils.getNovelContent(result).replaceAll(
+                            " ", "");
+                    str = str.replace("\n", "");
+                    if (isContainChinese(str) && !str.equals("")) {
+                        strContent = (currentPosition + 1) + "。"
+                                + ChapterList.get(currentPosition).getTitle() + "：" + "\n正文："
+                                + str;
+                    } else {
+                        strContent = "未能获取到资源，在更多选项中选择其他资源试试吧";
+                        countPage = 0;
+                        sentenceIndex = -1;
+                        position = 0;
+                    }
+                    if (isCollector) {
+                        isCollector = false;
+                    } else {
+                        countPage = 0;
+                        sentenceIndex = -1;
+                        position = 0;
+                    }
+                    setContent(strContent);
                 }
-                if (isCollector) {
-                    isCollector = false;
-                } else {
-                    countPage = 0;
-                    sentenceIndex = -1;
-                    position = 0;
-                }
-                setContent(strContent);
+
             }
 
         }).start();
@@ -430,20 +438,20 @@ public class ContentActivity extends ContentSplitActivity {
                 load.setVisibility(View.VISIBLE);
             }
         });
-        if (isDownLoad != -1) {
-            dwonLoadNextChapter();
-            return;
-        } else {
-            if (currentPosition < totalChapterCount - 1) {
-                currentPosition++;
-                getContentResource(ChapterList.get(currentPosition).getLink());
-            } else {
-                showToast("没有下一章了");
-                load.setVisibility(View.GONE);
-                finish();
-            }
+//        if (isDownLoad != -1) {
+        dwonLoadNextChapter();
+//            return;
+//        } else {
+//            if (currentPosition < totalChapterCount - 1) {
+//                currentPosition++;
+//                getContentResource(ChapterList.get(currentPosition).getLink(),false);
+//            } else {
+//                showToast("没有下一章了");
+//                load.setVisibility(View.GONE);
+//                finish();
+//            }
 
-        }
+//    }
 
     }
 
@@ -451,6 +459,9 @@ public class ContentActivity extends ContentSplitActivity {
         if (currentPosition < totalChapterCount - 1) {
             currentPosition++;
             playPlayback();
+            if (currentPosition + 1 < totalChapterCount - 1) {
+                getContentResource(ChapterList.get(currentPosition + 1).getLink(),currentPosition + 1, false);
+            }
         } else {
             showToast("没有下一章了");
             load.setVisibility(View.GONE);
@@ -474,17 +485,17 @@ public class ContentActivity extends ContentSplitActivity {
     public void preChapter() {
 
         load.setVisibility(View.VISIBLE);
-        if (isDownLoad != -1) {
-            dwonLoadPreChapter();
-            return;
-        } else {
-            currentPosition--;
-            if (currentPosition < 0) {
-                currentPosition = 0;
-                showToast("没有上一章了");
-            }
-            getContentResource(ChapterList.get(currentPosition).getLink());
-        }
+//        if (isDownLoad != -1) {
+        dwonLoadPreChapter();
+//        return;
+//        } else {
+//            currentPosition--;
+//            if (currentPosition < 0) {
+//                currentPosition = 0;
+//                showToast("没有上一章了");
+//            }
+//            getContentResource(ChapterList.get(currentPosition).getLink(),false);
+//        }
 
     }
 

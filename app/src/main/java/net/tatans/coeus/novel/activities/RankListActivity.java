@@ -61,7 +61,7 @@ public class RankListActivity extends BaseActivity {
 		lv_main = (ListView) findViewById(R.id.lv_main);
 		tv_loading = (TextView) findViewById(R.id.tv_loading);
 		new myAsycTesk().execute();
-		setData();
+//		setData();
 	}
 
 	/**
@@ -132,6 +132,7 @@ public class RankListActivity extends BaseActivity {
 
 	private void setData() {
 		if (al_Books.size() == 0) {
+			showToast(AppConstants.FAILED_TO_REQUEST_DATA);
 			return;
 		}
 		int to = (int) (AppConstants.APP_PAGE_SIZE + AppConstants.APP_PAGE_SIZE
