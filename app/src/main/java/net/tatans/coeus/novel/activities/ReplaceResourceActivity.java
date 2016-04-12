@@ -7,11 +7,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
@@ -46,6 +48,7 @@ public class ReplaceResourceActivity extends BaseActivity implements
 
     private ListView lv_one_list;
     private TitleAdapter listAdapter;
+    private TextView tv_loading;
     private String title;
     private int isDownLoad;
     private int currentPage = 1;
@@ -67,6 +70,18 @@ public class ReplaceResourceActivity extends BaseActivity implements
         setContentView(R.layout.list);
         db = TatansDb.create(AppConstants.TATANS_DB_NAME);
         lv_one_list = (ListView) findViewById(R.id.lv_main);
+        tv_loading = (TextView) findViewById(R.id.tv_loading);
+        tv_loading.setOnHoverListener(new View.OnHoverListener() {
+            @Override
+            public boolean onHover(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_HOVER_ENTER:
+                        showToast(getString(R.string.loading_hint));
+                        break;
+                }
+                return false;
+            }
+        });
         mRequestQueue = Volley.newRequestQueue(ReplaceResourceActivity.this);
         Intent intent = getIntent();
         totalChapterCount = intent.getIntExtra("totalChapterCount", 0);

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -44,6 +45,17 @@ public class BookListActivity extends BaseActivity implements
 		setContentView(R.layout.list);
 		lv_one_list = (ListView) findViewById(R.id.lv_main);
 		tv_loading = (TextView) findViewById(R.id.tv_loading);
+		tv_loading.setOnHoverListener(new View.OnHoverListener() {
+			@Override
+			public boolean onHover(View v, MotionEvent event) {
+				switch (event.getAction()) {
+					case MotionEvent.ACTION_HOVER_ENTER:
+						showToast(getString(R.string.loading_hint));
+						break;
+				}
+				return false;
+			}
+		});
 		name = getIntent().getStringExtra("name");
 		setTitle(name);
 //		myList = new ArrayList<String>();

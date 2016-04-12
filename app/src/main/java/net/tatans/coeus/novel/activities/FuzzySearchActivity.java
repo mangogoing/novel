@@ -102,6 +102,17 @@ public class FuzzySearchActivity extends BaseActivity implements
 
 		av_autotext.addTextChangedListener(this);
 		tv_loading = (TextView) findViewById(R.id.tv_loading);
+		tv_loading.setOnHoverListener(new View.OnHoverListener() {
+			@Override
+			public boolean onHover(View v, MotionEvent event) {
+				switch (event.getAction()) {
+					case MotionEvent.ACTION_HOVER_ENTER:
+						showToast(getString(R.string.loading_hint));
+						break;
+				}
+				return false;
+			}
+		});
 		tv_search = (TextView) findViewById(R.id.tv_search);
 		tv_search.setOnClickListener(this);
 //		av_autotext.setOnItemClickListener(new OnItemClickListener() {

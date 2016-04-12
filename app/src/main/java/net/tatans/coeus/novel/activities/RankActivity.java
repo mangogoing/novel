@@ -4,7 +4,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.accessibility.AccessibilityEvent;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -29,96 +31,106 @@ import java.util.ArrayList;
 
 /**
  * 排行榜界面
- * 
+ *
  * @author shiyunfei
- * 
  */
 public class RankActivity extends BaseActivity {
-	ArrayList<RankDto> al_rankingList = new ArrayList<RankDto>();
-	Gson gson = new Gson();
-	private ListView lv_main;
-	private TextView tv_loading;
-	String sRequest;
-	RankAdapter adapter;
-	private Speaker speaker;
-	private int pageCount;
-	private int currentPage = 1;
-	Handler handler = new Handler();
-	private boolean isSpeak;
+    ArrayList<RankDto> al_rankingList = new ArrayList<RankDto>();
+    Gson gson = new Gson();
+    private ListView lv_main;
+    private TextView tv_loading;
+    String sRequest;
+    RankAdapter adapter;
+    private Speaker speaker;
+    private int pageCount;
+    private int currentPage = 1;
+    Handler handler = new Handler();
+    private boolean isSpeak;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		speaker = Speaker.getInstance(getApplicationContext());
-		setContentView(R.layout.list);
-		setTitle("排行榜");
-		lv_main = (ListView) findViewById(R.id.lv_main);
-		tv_loading = (TextView) findViewById(R.id.tv_loading);
-		new myAsycTesk().execute();
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        speaker = Speaker.getInstance(getApplicationContext());
+        setContentView(R.layout.list);
+        setTitle("排行榜");
+        lv_main = (ListView) findViewById(R.id.lv_main);
+        tv_loading = (TextView) findViewById(R.id.tv_loading);
+        tv_loading.setOnHoverListener(new View.OnHoverListener() {
+            @Override
+            public boolean onHover(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_HOVER_ENTER:
+                        showToast(getString(R.string.loading_hint));
+                        break;
+                }
+                return false;
+            }
+        });
+        new myAsycTesk().execute();
 
-	}
+    }
 
-	/**
-	 * 网络请求
-	 */
-	class myAsycTesk extends AsyncTask<Void, Void, String> {
+    /**
+     * 网络请求
+     */
+    class myAsycTesk extends AsyncTask<Void, Void, String> {
 
-		@Override
-		protected String doInBackground(Void... params) {
-			TatansHttp http = new TatansHttp();
-			http.get(UrlUtil.RANK, new HttpRequestCallBack<String>() {
-				@Override
-				public void onLoading(long count, long current) {
-					super.onLoading(count, current);
-				}
+        @Override
+        protected String doInBackground(Void... params) {
+            TatansHttp http = new TatansHttp();
+            http.get(UrlUtil.RANK, new HttpRequestCallBack<String>() {
+                @Override
+                public void onLoading(long count, long current) {
+                    super.onLoading(count, current);
+                }
 
-				@Override
-				public void onSuccess(String arg0) {
-					super.onSuccess(arg0);
+                @Override
+                public void onSuccess(String arg0) {
+                    super.onSuccess(arg0);
 					lv_main.setVisibility(View.VISIBLE);
-					json2Gson(arg0);
+                    json2Gson(arg0);
 //					handler.post(result2json);
 
-				}
+                }
 
-				@Override
-				public void onFailure(Throwable t, String strMsg) {
-					showToast(AppConstants.FAILED_TO_REQUEST_DATA);
-					tv_loading.setText(AppConstants.FAILED_TO_REQUEST_DATA);
-					Log.d("NetWorkError", strMsg);
-					super.onFailure(t, strMsg);
-				}
-			});
-			return null;
-		}
-	}
+                @Override
+                public void onFailure(Throwable t, String strMsg) {
+                    showToast(AppConstants.FAILED_TO_REQUEST_DATA);
+                    tv_loading.setText(AppConstants.FAILED_TO_REQUEST_DATA);
+                    Log.d("NetWorkError", strMsg);
+                    super.onFailure(t, strMsg);
+                }
+            });
+            return null;
+        }
+    }
 
-	/**
-	 * 解析json
-	 */
-	private void json2Gson(String result) {
-		try {
-			JSONObject mresult = new JSONObject(result);
-			String ok = mresult.getString("ok");
-			if (ok.equals("true")) {
-				JSONArray array = mresult.getJSONArray("rankings");
-				for (int i = 0; i < array.length(); i++) {
-					JSONObject obj = array.getJSONObject(i);
-					RankDto item = gson.fromJson(obj.toString(), RankDto.class);
-					al_rankingList.add(item);
-				}
-			}
-			pageCount = (int) Math.ceil(al_rankingList.size()
-					/ AppConstants.APP_PAGE_SIZE);
-			setData();
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
+    /**
+     * 解析json
+     */
+    private void json2Gson(String result) {
+        try {
+            JSONObject mresult = new JSONObject(result);
+            String ok = mresult.getString("ok");
+            if (ok.equals("true")) {
+                JSONArray array = mresult.getJSONArray("rankings");
+                for (int i = 0; i < array.length(); i++) {
+                    JSONObject obj = array.getJSONObject(i);
+                    RankDto item = gson.fromJson(obj.toString(), RankDto.class);
+                    al_rankingList.add(item);
+                }
+            }
+            pageCount = (int) Math.ceil(al_rankingList.size()
+                    / AppConstants.APP_PAGE_SIZE);
+            setData();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-	}
+    }
 
 	/*@Override
-	public void left() {
+    public void left() {
 		currentPage++;
 		if (currentPage > pageCount) {
 			currentPage = pageCount;
@@ -157,80 +169,80 @@ public class RankActivity extends BaseActivity {
 		}
 	}*/
 
-	Runnable result2json = new Runnable() {
+    Runnable result2json = new Runnable() {
 
-		@Override
-		public void run() {
+        @Override
+        public void run() {
 //			showToast("排行榜，当前所在第" + currentPage + "页，共" + pageCount + "页");
-			setData();
-		}
-	};
+            setData();
+        }
+    };
 
-	/**
-	 * 配置适配器加载数据
-	 */
-	private void setData() {
-		if (al_rankingList.size() == 0) {
-			return;
-		}
-		int to = (int) (AppConstants.APP_PAGE_SIZE + AppConstants.APP_PAGE_SIZE
-				* (currentPage - 1));
-		int from = (int) (AppConstants.APP_PAGE_SIZE * (currentPage - 1));
-		if (to > al_rankingList.size()) {
-			to = al_rankingList.size();
-		}
-		adapter = new RankAdapter(al_rankingList,
-				this.getApplicationContext(), (int) AppConstants.APP_PAGE_SIZE);
-		lv_main.setAdapter(adapter);
-	}
+    /**
+     * 配置适配器加载数据
+     */
+    private void setData() {
+        if (al_rankingList.size() == 0) {
+            return;
+        }
+        int to = (int) (AppConstants.APP_PAGE_SIZE + AppConstants.APP_PAGE_SIZE
+                * (currentPage - 1));
+        int from = (int) (AppConstants.APP_PAGE_SIZE * (currentPage - 1));
+        if (to > al_rankingList.size()) {
+            to = al_rankingList.size();
+        }
+        adapter = new RankAdapter(al_rankingList,
+                this.getApplicationContext(), (int) AppConstants.APP_PAGE_SIZE);
+        lv_main.setAdapter(adapter);
+    }
 
-	//
-	// private void speechShow(String text) {
-	// // if (speaker == null) {
-	// // speaker = Speaker.getInstance(RankActivity.this);
-	// // }
-	// // speaker.speech(text);
-	// Toast toast = Toast.makeText(getApplicationContext(), text, 100);
-	// toast.show();
-	//
-	// }
+    //
+    // private void speechShow(String text) {
+    // // if (speaker == null) {
+    // // speaker = Speaker.getInstance(RankActivity.this);
+    // // }
+    // // speaker.speech(text);
+    // Toast toast = Toast.makeText(getApplicationContext(), text, 100);
+    // toast.show();
+    //
+    // }
 
-	private void showToast(String text) {
-		TatansToast.showAndCancel( text);
-	}
+    private void showToast(String text) {
+        TatansToast.showAndCancel(text);
+    }
 
-	@Override
-	protected void onResume() {
-		super.onResume();
+    @Override
+    protected void onResume() {
+        super.onResume();
 //		if (isSpeak) {
 //			setTitle("排行榜");
 //		} else {
 //			isSpeak = true;
 //		}
 
-	}
+    }
 
-	@Override
-	public void left() {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void left() {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void right() {
-		// TODO Auto-generated method stub
-		
-	}
+    }
 
-	@Override
-	public void up() {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void right() {
+        // TODO Auto-generated method stub
 
-	@Override
-	public void down() {
-		// TODO Auto-generated method stub
-		
-	}
+    }
+
+    @Override
+    public void up() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void down() {
+        // TODO Auto-generated method stub
+
+    }
 }

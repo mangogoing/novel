@@ -576,10 +576,6 @@ public class ContentActivity extends ContentSplitActivity {
         for (int i = 0; i < lt_collector.size(); i++) {
             if (lt_collector.get(i).get_id().equals(bookId)) {
                 CollectorDto item = db.findById(bookId, CollectorDto.class);
-                sentenceIndex--;
-                if (sentenceIndex <= -2) {
-                    sentenceIndex = -1;
-                }
                 if (currentPosition < 0) {
                     currentPosition = 0;
                 }

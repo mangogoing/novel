@@ -11,6 +11,7 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.telephony.PhoneStateListener;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.accessibility.AccessibilityManager;
@@ -163,6 +164,17 @@ public class ContentSplitActivity extends BaseActivity {
         speaker.setSpeechOnResume(false);
         setContentView(R.layout.txt_play);
         load = (TextView) findViewById(R.id.load);
+        load.setOnHoverListener(new View.OnHoverListener() {
+            @Override
+            public boolean onHover(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_HOVER_ENTER:
+                        showToast(getString(R.string.loading_hint));
+                        break;
+                }
+                return false;
+            }
+        });
         next = (TextView) findViewById(R.id.next);
         pause_or_play = (TextView) findViewById(R.id.pause);
         pre = (TextView) findViewById(R.id.pre);
