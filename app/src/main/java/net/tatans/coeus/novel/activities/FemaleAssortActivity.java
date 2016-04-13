@@ -156,8 +156,8 @@ public class FemaleAssortActivity extends BaseActivity implements
 //				oneList);
 		listAdapter = new TitleAdapter(getApplicationContext(), oneList);
 		lv_one_list.setAdapter(listAdapter);
-		lv_one_list.setAdapter(listAdapter);
-
+//		lv_one_list.setAdapter(listAdapter);
+		tv_loading.setVisibility(View.GONE);
 	}
 
 	/*@Override

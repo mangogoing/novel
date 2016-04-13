@@ -68,6 +68,7 @@ public class CollectorActivity extends BaseActivity {
         proDia = new ProgressDialog(this);
         proDia.setTitle("移除中");
         proDia.setCancelable(false);
+
         mRequestQueue = Volley.newRequestQueue(this);
         lv_main = (ListView) findViewById(R.id.lv_main);
         TextView tv_loading = (TextView) findViewById(R.id.tv_loading);

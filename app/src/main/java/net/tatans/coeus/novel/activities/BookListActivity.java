@@ -167,7 +167,7 @@ public class BookListActivity extends BaseActivity implements
 		// R.layout.list_item, R.id.tv_item_name, list);
 		listAdapter = new BookListAdapter(getApplicationContext(), classificatList);
 		lv_one_list.setAdapter(listAdapter);
-
+		tv_loading.setVisibility(View.GONE);
 	}
 
 	@Override

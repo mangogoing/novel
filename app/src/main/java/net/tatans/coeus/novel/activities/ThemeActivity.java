@@ -107,7 +107,6 @@ public class ThemeActivity extends BaseActivity {
 				@Override
 				public void onSuccess(String arg0) {
 					super.onSuccess(arg0);
-					lv_main.setVisibility(View.VISIBLE);
 					json2Gson(arg0);
 					handler.post(result2json);
 
@@ -208,6 +207,7 @@ public class ThemeActivity extends BaseActivity {
 		adapter = new ThemeAdapter(al_BooksTheme,
 				this.getApplicationContext(), (int) AppConstants.APP_PAGE_SIZE);
 		lv_main.setAdapter(adapter);
+		tv_loading.setVisibility(View.GONE);
 	}
 
 	// private void speechShow(String text) {

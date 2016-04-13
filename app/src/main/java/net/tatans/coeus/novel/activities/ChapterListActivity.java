@@ -271,8 +271,6 @@ public class ChapterListActivity extends BaseActivity implements
                 titleList.add(ChapterList.get(i).getTitle());
                 sortList.add(i + 1);
             }
-
-
             handler.post(result2json);
         }
 
@@ -296,6 +294,7 @@ public class ChapterListActivity extends BaseActivity implements
         lv_one_list.setAdapter(listAdapter);
         lv_one_list.setSelection(currentPosition);
         lv_one_list.setVisibility(View.VISIBLE);
+        tv_loading.setVisibility(View.GONE);
     }
 
     @Override

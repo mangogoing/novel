@@ -193,6 +193,7 @@ public class ThemeListActivity extends BaseActivity {
 		adapter = new ThemeListAdapter(al_BooksThemeList,
 				this.getApplicationContext(), (int) AppConstants.APP_PAGE_SIZE);
 		lv_main.setAdapter(adapter);
+		tv_loading.setVisibility(View.GONE);
 	}
 
 	// private void speechShow(String text) {

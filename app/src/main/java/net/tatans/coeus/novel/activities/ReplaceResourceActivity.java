@@ -220,7 +220,7 @@ public class ReplaceResourceActivity extends BaseActivity implements
 
         listAdapter = new TitleAdapter(getApplicationContext(), titleList);
         lv_one_list.setAdapter(listAdapter);
-        lv_one_list.setVisibility(View.VISIBLE);
+        tv_loading.setVisibility(View.GONE);
     }
 
     @Override

@@ -87,7 +87,6 @@ public class RankActivity extends BaseActivity {
                 @Override
                 public void onSuccess(String arg0) {
                     super.onSuccess(arg0);
-					lv_main.setVisibility(View.VISIBLE);
                     json2Gson(arg0);
 //					handler.post(result2json);
 
@@ -194,6 +193,7 @@ public class RankActivity extends BaseActivity {
         adapter = new RankAdapter(al_rankingList,
                 this.getApplicationContext(), (int) AppConstants.APP_PAGE_SIZE);
         lv_main.setAdapter(adapter);
+        tv_loading.setVisibility(View.GONE);
     }
 
     //

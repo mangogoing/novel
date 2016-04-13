@@ -8,6 +8,7 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.umeng.analytics.MobclickAgent;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends BaseActivity implements OnItemClickListener {
+	private RelativeLayout ll_disclaimer;
 	private List<String> mainList;
 	private ListView lv_main;
 	private TextView tx_disclaimer, tv_local;
@@ -33,6 +35,7 @@ public class MainActivity extends BaseActivity implements OnItemClickListener {
 		setContentView(R.layout.main);
 		lv_main = (ListView) findViewById(R.id.lv_novel_mian);
 		tx_disclaimer = (TextView) findViewById(R.id.tx_disclaimer);
+		ll_disclaimer = (RelativeLayout) findViewById(R.id.ll_disclaimer);
 		tv_local = (TextView) findViewById(R.id.tv_local);
 		setTitle("天坦小说");
 		mainList = new ArrayList<String>();
@@ -49,7 +52,7 @@ public class MainActivity extends BaseActivity implements OnItemClickListener {
 		listAdapter = new MainAdapter(getApplicationContext(), mainList);
 		lv_main.setAdapter(listAdapter);
 		lv_main.setOnItemClickListener(this);
-		tx_disclaimer.setOnClickListener(new OnClickListener() {
+		ll_disclaimer.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
