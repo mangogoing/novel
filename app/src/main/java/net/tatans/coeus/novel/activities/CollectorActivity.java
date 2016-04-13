@@ -58,6 +58,7 @@ public class CollectorActivity extends BaseActivity {
     private RequestQueue mRequestQueue;
     private DownLoadProgressReciver downLoadProgressReciver = null;
     private ProgressDialog proDia;
+    private TextView tv_loading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +72,7 @@ public class CollectorActivity extends BaseActivity {
 
         mRequestQueue = Volley.newRequestQueue(this);
         lv_main = (ListView) findViewById(R.id.lv_main);
-        TextView tv_loading = (TextView) findViewById(R.id.tv_loading);
+        tv_loading = (TextView) findViewById(R.id.tv_loading);
         tv_loading.setOnHoverListener(new View.OnHoverListener() {
             @Override
             public boolean onHover(View v, MotionEvent event) {
@@ -233,6 +234,7 @@ public class CollectorActivity extends BaseActivity {
                 AppConstants.APP_PAGE_SIZE, currentPage, map, proDia);
         lv_main.setAdapter(adapter);
         lv_main.setVisibility(View.VISIBLE);
+        tv_loading.setVisibility(View.GONE);
         handler.post(new Runnable() {
 
             @Override
@@ -242,6 +244,7 @@ public class CollectorActivity extends BaseActivity {
                 Log.d("position", start + ":" + end + "");
             }
         });
+
 
     }
 
@@ -259,6 +262,7 @@ public class CollectorActivity extends BaseActivity {
 
         @Override
         public void run() {
+            tv_loading.setVisibility(View.GONE);
             showToast("您没有收藏任何小说，去其他地方看看吧");
             setContentView(R.layout.null_log);
         }

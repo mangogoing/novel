@@ -423,7 +423,7 @@ public class ContentSplitActivity extends BaseActivity {
                     // String[] nextSplit = mEditText.getText()
                     // .toString().split("，|。|！|？|；");
                     Log.i(TAG, "nextSplit[1]:" + nextSplit[1]);
-                    sentenceIndex = map.get(nextSplit[1])-1;
+                    sentenceIndex = map.get(nextSplit[1]) - 1;
                     if ("暂停".equals(pause_or_play.getText().toString())) {
                         readNextSentence();
                     }
@@ -455,7 +455,7 @@ public class ContentSplitActivity extends BaseActivity {
                     // .toString().split("，|。|！|？|；");
                     try {
                         Log.i(TAG, "nextSplit[1]:" + nextSplit[1]);
-                        sentenceIndex = map.get(nextSplit[1])-1;
+                        sentenceIndex = map.get(nextSplit[1]) - 1;
                     } catch (Exception e) {
                         nextInformation();
                     }
@@ -606,6 +606,9 @@ public class ContentSplitActivity extends BaseActivity {
      * 读取下一句话
      */
     public void readNextSentence() {
+        if (speaker == null) {
+            return;
+        }
         if (sResult != null) {
             sentenceIndex++;
             speaker.setOnSpeechCompletionListener(listener);
@@ -667,7 +670,9 @@ public class ContentSplitActivity extends BaseActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        speaker.setSpeechOnResume(true);
+        if(speaker!=null){
+            speaker.setSpeechOnResume(true);
+        }
         TatansToast.cancel();
     }
 
@@ -706,12 +711,6 @@ public class ContentSplitActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (speaker != null) {
-            speaker.stop();
-
-            speaker.setOnSpeechCompletionListener(null);
-            speaker = null;
-        }
         if (net.tatans.coeus.speaker.Speaker.getInstance(
                 ContentSplitActivity.this).isSpeaking()) {
             net.tatans.coeus.speaker.Speaker.getInstance(
@@ -767,7 +766,7 @@ public class ContentSplitActivity extends BaseActivity {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                if (isSpeaking){
+                if (isSpeaking) {
                     showToast("暂停播放");
                 }
                 speaker.pause();

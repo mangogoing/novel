@@ -280,7 +280,7 @@ public class DownLoadService extends Service {
                         String k_t = CipherUtil.getKey_t(httpLink);
                         String url = "http://chapter2.zhuishushenqi.com"
                                 + httpLink + "?" + k_t;
-
+                        Log.d("WWWWWWWWWWW", url);
                         JsonObjectRequest jr = new JsonObjectRequest(
                                 Request.Method.GET, url,
                                 new Response.Listener<JSONObject>() {
@@ -321,7 +321,17 @@ public class DownLoadService extends Service {
                                     }
                                 }).start();
                             }
-                        });
+                        }){
+                            @Override
+                            public Map<String, String> getHeaders() {
+                                Map<String, String> headers = new HashMap<String, String>();
+                                headers.put("User-Agent",
+                                        "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
+                                headers.put("Content-Encoding", "gzip");
+                                headers.put("Content-Type", " application/json; charset=utf-8");
+                                return headers;
+                            }
+                        };
                         jr.setTag("NOVEL_REQUEST");
                         mRequestQueue.add(jr);
                     } else {

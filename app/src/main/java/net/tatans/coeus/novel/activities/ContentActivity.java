@@ -12,7 +12,13 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.ushaqi.zhuishushenqi.util.CipherUtil;
 
 import net.tatans.coeus.network.callback.HttpRequestCallBack;
@@ -30,6 +36,8 @@ import net.tatans.coeus.novel.tools.SharedPreferencesUtil;
 import net.tatans.coeus.novel.tools.UrlUtil;
 import net.tatans.coeus.util.Callback;
 
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +49,9 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,6 +77,7 @@ public class ContentActivity extends ContentSplitActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         db = TatansDb.create(AppConstants.TATANS_DB_NAME);
+        mRequestQueue = Volley.newRequestQueue(this);
         init();
 
     }
@@ -180,8 +191,6 @@ public class ContentActivity extends ContentSplitActivity {
 
                     totalChapterCount = summarylist.get(sourceNum)
                             .getChaptersCount();
-                    Log.d("OOOXXXOOO", summarylist.get(sourceNum).getName()
-                            + "----" + sourceNum);
                     getChapterResource(summarylist.get(sourceNum).get_id());
                 }
             }
@@ -197,133 +206,178 @@ public class ContentActivity extends ContentSplitActivity {
     }
 
     /**
+     * 获取章节列表
+     */
+    private void getChapterResource(final String id) {
+        String viewChaptersUrl = "";
+        viewChaptersUrl = UrlUtil.VIEW_CHAPTERS
+                + id + "?view=chapters";
+
+        StringRequest jrChapterLists = new StringRequest(Request.Method.GET,
+                viewChaptersUrl, new Response.Listener<String>() {
+            @Override
+            public void onResponse(final String response) {
+                ChapterList = JsonUtils.getChapterListByJson(response.toString());
+                if (ChapterList.size() > 0 && currentPosition < ChapterList.size() - 2) {
+                    getContentResource(ChapterList.get(currentPosition)
+                            .getLink(), currentPosition, true);
+                    getContentResource(ChapterList.get(currentPosition + 1)
+                            .getLink(), currentPosition + 1, false);
+                }
+
+            }
+
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                showToast("未能请求到数据，请检查网络");
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put("User-Agent",
+                        "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
+                headers.put("Content-Encoding", "gzip");
+                headers.put("Content-Type", " application/json; charset=utf-8");
+                return headers;
+            }
+
+        };
+        mRequestQueue.add(jrChapterLists);
+    }
+
+    /**
      * @param
      * @param newBookId
      * @return 网站资源列表
      */
-    private void getChapterResource(final String newBookId) {
-        new Thread(new Runnable() {
+//    private void getChapterResource(final String newBookId) {
+//        new Thread(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                HttpURLConnection cumtConnection;
+//                InputStream urlStream = null;
+//                BufferedReader reader = null;
+//                String result = "";
+//                try {
+//                    cumtConnection = (HttpURLConnection) new URL(
+//                            UrlUtil.RESOURCE_BOOK_ID + newBookId
+//                                    + "?view=chapters").openConnection();
+//                    cumtConnection.setRequestProperty("User-Agent",
+//                            "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
+//                    urlStream = cumtConnection.getInputStream();
+//                    reader = new BufferedReader(
+//                            new InputStreamReader(urlStream, "UTF-8"));
+//                    String line;
+//                    while ((line = reader.readLine()) != null) {
+//                        result = result + line;
+//                        Log.d("XXXXXXXXXX", line.toString());
+//                    }
+//                } catch (MalformedURLException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                } finally {
+//                    try {
+//                        reader.close();
+//                        urlStream.close();
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                if (result.equals("")) {
+//                    setContent("未能获取到资源，在更多选项中选择其他资源试试吧");
+//                } else {
+//                    try {
+//                        ChapterList = JsonUtils.getChapterListByJson(result);
+//                        getContentResource(ChapterList.get(currentPosition)
+//                                .getLink(), currentPosition, true);
+////                        getContentResource(ChapterList.get(currentPosition + 1)
+////                                .getLink(), currentPosition + 1, false);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                        setContent("未能获取到资源，在更多选项中选择其他资源试试吧");
+//                    }
+//                }
+//            }
+//        }
+//        ).start();
+//    }
+    private void getContentResource(final String link, final int chapterPosition, final boolean isFirst) {
+        String url = "";
+        String url1 = "http://chapter2.zhuishushenqi.com";
+        String url2 = null;
+        try {
+            url2 = "/chapter/" + URLEncoder.encode(link, "UTF8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        String key = CipherUtil.getKey_t(url2);
+        url = url1 + url2 + "?" + key;
+        Log.d("XXXXXXXXsssXX", url.toString());
+        JsonObjectRequest jr = new JsonObjectRequest(
+                Request.Method.GET, url,
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(final JSONObject response) {
+                        Log.d("XXXXXXXXsssXX", response.toString());
+                        FileUtil.write(response.toString(), chapterPosition,
+                                bookId, sourceNum);
+                        isFirstSetContent(response.toString(), isFirst);
+                    }
+                }, new Response.ErrorListener() {
 
             @Override
-            public void run() {
-                HttpURLConnection cumtConnection;
-                InputStream urlStream = null;
-                BufferedReader reader = null;
-                String result = "";
-                try {
-                    cumtConnection = (HttpURLConnection) new URL(
-                            UrlUtil.RESOURCE_BOOK_ID + newBookId
-                                    + "?view=chapters").openConnection();
-                    cumtConnection.setRequestProperty("User-Agent",
-                            "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
-                    urlStream = cumtConnection.getInputStream();
-                    reader = new BufferedReader(
-                            new InputStreamReader(urlStream, "UTF-8"));
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        result = result + line;
-                        Log.d("XXXXXXXXXX", line.toString());
-                    }
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        reader.close();
-                        urlStream.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if (result.equals("")) {
-                    setContent("未能获取到资源，在更多选项中选择其他资源试试吧");
-                } else {
-                    try {
-                        ChapterList = JsonUtils.getChapterListByJson(result);
-                        getContentResource(ChapterList.get(currentPosition)
-                                .getLink(), currentPosition, true);
-                        getContentResource(ChapterList.get(currentPosition + 1)
-                                .getLink(), currentPosition + 1, false);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        setContent("未能获取到资源，在更多选项中选择其他资源试试吧");
-                    }
-                }
+            public void onErrorResponse(
+                    VolleyError error) {
+                Log.d("XXXXXXXXsssXX",error.toString());
+                isFirstSetContent(error.toString(), isFirst);
             }
-        }
-        ).start();
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put("User-Agent",
+                        "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
+                headers.put("Content-Encoding", "gzip");
+                headers.put("Content-Type", " application/json; charset=utf-8");
+                return headers;
+            }
+        };
+        jr.setTag("NOVEL_REQUEST");
+        mRequestQueue.add(jr);
+
     }
 
-
-    private void getContentResource(final String link, final int chapterPosition, final boolean isFirst) {
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                BufferedReader reader = null;
-                InputStream urlStream = null;
-                String result = "";
-                try {
-                    String url1 = "http://chapter2.zhuishushenqi.com";
-                    String url2 = "/chapter/" + URLEncoder.encode(link, "UTF8");
-                    String key = CipherUtil.getKey_t(url2);
-                    String url = url1 + url2 + "?" + key;
-                    HttpURLConnection cumtConnection;
-                    cumtConnection = (HttpURLConnection) new URL(url)
-                            .openConnection();
-                    cumtConnection.setRequestProperty("User-Agent",
-                            "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
-                    urlStream = cumtConnection.getInputStream();
-                    reader = new BufferedReader(
-                            new InputStreamReader(urlStream, "UTF-8"));
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        result = result + line;
-                    }
-                    FileUtil.write(result, chapterPosition,
-                            bookId, sourceNum);
-                } catch (MalformedURLException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        reader.close();
-                        urlStream.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                if (isFirst) {
-                    String str = JsonUtils.getNovelContent(result).replaceAll(
-                            " ", "");
-                    str = str.replace("\n", "");
-                    if (isContainChinese(str) && !str.equals("")) {
-                        strContent = (currentPosition + 1) + "。"
-                                + ChapterList.get(currentPosition).getTitle() + "：" + "\n正文："
-                                + str;
-                    } else {
-                        strContent = "未能获取到资源，在更多选项中选择其他资源试试吧";
-                        countPage = 0;
-                        sentenceIndex = -1;
-                        position = 0;
-                    }
-                    if (isCollector) {
-                        isCollector = false;
-                    } else {
-                        countPage = 0;
-                        sentenceIndex = -1;
-                        position = 0;
-                    }
-                    setContent(strContent);
-                }
-
+    private void isFirstSetContent(String result, boolean isFirst) {
+        if (isFirst) {
+            String str = JsonUtils.getNovelContent(result).replaceAll(
+                    " ", "");
+            str = str.replace("\n", "");
+            if (isContainChinese(str) && !str.equals("")) {
+                strContent = (currentPosition + 1) + "。"
+                        + ChapterList.get(currentPosition).getTitle() + "：" + "\n正文："
+                        + str;
+            } else {
+                strContent = "未能获取到资源，在更多选项中选择其他资源试试吧";
+                countPage = 0;
+                sentenceIndex = -1;
+                position = 0;
             }
-
-        }).start();
-
+            if (isCollector) {
+                isCollector = false;
+            } else {
+                countPage = 0;
+                sentenceIndex = -1;
+                position = 0;
+            }
+            setContent(strContent);
+        }
     }
 
     private boolean isContainChinese(String str) {
@@ -459,8 +513,13 @@ public class ContentActivity extends ContentSplitActivity {
         if (currentPosition < totalChapterCount - 1) {
             currentPosition++;
             playPlayback();
-            if (currentPosition + 1 < totalChapterCount - 1) {
-                getContentResource(ChapterList.get(currentPosition + 1).getLink(),currentPosition + 1, false);
+            if (currentPosition + 1 < totalChapterCount - 2) {
+                try {
+                    getContentResource(ChapterList.get(currentPosition + 1).getLink(), currentPosition + 1, false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    setContent("未能获取到资源，在更多选项中选择其他资源试试吧");
+                }
             }
         } else {
             showToast("没有下一章了");
@@ -560,6 +619,11 @@ public class ContentActivity extends ContentSplitActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (speaker != null) {
+            speaker.stop();
+            speaker.setOnSpeechCompletionListener(null);
+            speaker = null;
+        }
 //		save();
     }
 
@@ -592,7 +656,11 @@ public class ContentActivity extends ContentSplitActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            speaker.pause();
+            if (speaker != null) {
+                speaker.stop();
+                speaker.setOnSpeechCompletionListener(null);
+                speaker = null;
+            }
             mAudioManagerUtil.abandonAudioFocus();
             if (hasCollectored() == false) {
                 prompt();
