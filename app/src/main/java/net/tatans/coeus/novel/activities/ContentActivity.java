@@ -32,20 +32,12 @@ import net.tatans.coeus.novel.dto.SummaryDto;
 import net.tatans.coeus.novel.tools.FilePathUtil;
 import net.tatans.coeus.novel.tools.FileUtil;
 import net.tatans.coeus.novel.tools.JsonUtils;
-import net.tatans.coeus.novel.tools.SharedPreferencesUtil;
 import net.tatans.coeus.novel.tools.UrlUtil;
-import net.tatans.coeus.util.Callback;
 
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
@@ -66,99 +58,132 @@ public class ContentActivity extends ContentSplitActivity {
     private static String TAG = "ContentActivity";
     private String strContent = ""; // 资讯内容
     private TatansDb db;
-    private String chapterFilePath, sourceFilePath;
-    private List<ChapterDto> ChapterList;
+    private List<ChapterDto> chapterList;
     private String filePath;
     private RequestQueue mRequestQueue;
     private int sourceNum = 0;
     private String source;
+    private int totalChapterCount = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        db = TatansDb.create(AppConstants.TATANS_DB_NAME);
-        mRequestQueue = Volley.newRequestQueue(this);
         init();
 
     }
 
     private void init() {
+        db = TatansDb.create(AppConstants.TATANS_DB_NAME);
+        mRequestQueue = Volley.newRequestQueue(this);
         try {
             source = db.findById(bookId, CollectorDto.class)
                     .getSource();
         } catch (NullPointerException e) {
             source = "0";
         }
-
         sourceNum = Integer.parseInt(source);
-        sourceFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.SOURCE_LIST_TXT, 0);
-        if (isDownLoad == 1 && FileUtil.fileIsExists(sourceFilePath)
-                || isDownLoad == 3 && FileUtil.fileIsExists(sourceFilePath)
-                || isDownLoad == 0 && FileUtil.fileIsExists(sourceFilePath) || isDownLoad == -1 && FileUtil.fileIsExists(sourceFilePath)) {
-            // 如果资源列表txt存在读取资源列表
-            new readSummaryListFromSDcard().execute();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                totalChapterCount = getLocalChapterCount(bookId, UrlUtil.CHAPTER_LIST_TXT, sourceNum);
 
-        } else {
-            // 网络请求
-            getSummaryResource(this, mRequestQueue, bookId);
-        }
-    }
+                if (totalChapterCount == 0) {
+                    // 网络请求
+                    getSummaryResource(ContentActivity.this, mRequestQueue, bookId);
+                } else {
 
-
-    class readSummaryListFromSDcard extends AsyncTask<Void, Void, String> {
-
-        @Override
-        protected String doInBackground(Void... params) {
-            try {
-                String result = FileUtil.read(sourceFilePath).toString();
-                summarylist = JsonUtils.getSummaryListByJson(result);
-                if (summarylist.size() > 0) {
-                    if (sourceNum > summarylist.size() - 1) {
-                        sourceNum = summarylist.size() - 1;
-                    }
-                    display();
+                    playPlayback();
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
             }
-            return null;
-        }
+        }).start();
 
     }
 
-    private void display() {
-        chapterFilePath = FilePathUtil.getFilePath(bookId, -1, sourceNum);
-        if (isDownLoad == 1 && FileUtil.fileIsExists(chapterFilePath)
-                || isDownLoad == 0 && FileUtil.fileIsExists(chapterFilePath)) {
-            String result;
+    /**
+     * @param bookId
+     * @return 网站资源列表
+     */
+    private void getChapterListCount(final String bookId) {
+        String bookBriefUrl = UrlUtil.RESOURCE_LIST + bookId;
+        TatansHttp http = new TatansHttp();
+        http.addHeader("User-Agent",
+                "ZhuiShuShenQi/3.30.2(Android 5.1.1; TCL TCL P590L / TCL TCL P590L; )");
+        http.get(bookBriefUrl, new HttpRequestCallBack<String>() {
+                    @Override
+                    public void onSuccess(String result) {
+                        super.onSuccess(result);
+                        List<SummaryDto> summarylist = JsonUtils.getSummaryListByJson(result.toString());
+                        int count = summarylist.get(sourceNum)
+                                .getChaptersCount();
+                        Log.d(TAG,"本地共有章节："+totalChapterCount+"---"+"最新共有章节："+count);
+                        totalChapterCount = count;
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t, String strMsg) {
+                        HttpProces.failHttp();
+                    }
+                }
+        );
+    }
+
+//    private void geLocalSummaryResource(String bookId, int sourceName, int sourceNum) {
+//        String sourceFilePath = FilePathUtil.getFilePath(bookId, sourceName, sourceNum);
+//        if (FileUtil.fileIsExists(sourceFilePath)) {
+//            // 如果资源列表txt存在读取资源列表
+//            String result = "";
+//            try {
+//                result = FileUtil.read(sourceFilePath).toString();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            List<SummaryDto> summarylist = JsonUtils.getSummaryListByJson(result);
+//            if (summarylist.size() > 0) {
+//                if (sourceNum > summarylist.size() - 1) {
+//                    sourceNum = summarylist.size() - 1;
+//                }
+//                display();
+//            } else {
+//                showToast("读取小说文件失败，建议重新下载该资源");
+//            }
+//        }
+//    }
+
+
+    private int getLocalChapterCount(String bookId, int chapterName, int sourceNum) {
+        int chapterCount = 0;
+        String chapterFilePath = FilePathUtil.getFilePath(bookId, chapterName, sourceNum);
+        if (FileUtil.fileIsExists(chapterFilePath) && isDownLoad != 3) {
             try {
-                result = FileUtil.read(chapterFilePath).toString();
-                ChapterList = JsonUtils.getChapterListByJson(result);
-                totalChapterCount = ChapterList.size();
+                String result = FileUtil.read(chapterFilePath).toString();
+                List<ChapterDto> chapterList = JsonUtils.getChapterListByJson(result);
+                setChapterList(chapterList);
+                chapterCount = chapterList.size();
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else if (FileUtil.fileIsExists(chapterFilePath) && isDownLoad == 3) {
             try {
-                totalChapterCount = FileUtil.read2Chapter(chapterFilePath)
+                chapterCount = FileUtil.read2Chapter(chapterFilePath)
                         .size();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        playPlayback();
+        return chapterCount;
+    }
+
+    private void setChapterList(List<ChapterDto> chapterList) {
+        this.chapterList = chapterList;
     }
 
 
     private void playPlayback() {
-
         filePath = FilePathUtil.getFilePath(bookId, currentPosition, sourceNum);
-
-//        if (isDownLoad == 1 && FileUtil.fileIsExists(filePath)
-//                || isDownLoad == 3 && FileUtil.fileIsExists(filePath)
-//                || isDownLoad == 0 && FileUtil.fileIsExists(filePath)) {
         if (FileUtil.fileIsExists(filePath)) {
             // 如果不为-1，并且该章节没有漏下则离线阅读
+            getChapterListCount(bookId);
             new readFromSDcard().execute();
         } else {
             // 网络请求
@@ -166,7 +191,6 @@ public class ContentActivity extends ContentSplitActivity {
         }
     }
 
-    List<SummaryDto> summarylist;
 
     /**
      * @param context
@@ -174,35 +198,43 @@ public class ContentActivity extends ContentSplitActivity {
      * @return 网站资源列表
      */
     private void getSummaryResource(Context context,
-                                    final RequestQueue mRequestQueue, String bookId) {
+                                    final RequestQueue mRequestQueue, final String bookId) {
         String bookBriefUrl = UrlUtil.RESOURCE_LIST + bookId;
         TatansHttp http = new TatansHttp();
         http.addHeader("User-Agent",
                 "ZhuiShuShenQi/3.30.2(Android 5.1.1; TCL TCL P590L / TCL TCL P590L; )");
         http.get(bookBriefUrl, new HttpRequestCallBack<String>() {
-            @Override
-            public void onSuccess(String result) {
-                super.onSuccess(result);
-                summarylist = JsonUtils.getSummaryListByJson(result.toString());
-                if (summarylist.size() > 0) {
-                    if (sourceNum > summarylist.size() - 1) {
-                        sourceNum = summarylist.size() - 1;
+                    @Override
+                    public void onSuccess(String result) {
+                        super.onSuccess(result);
+                        FileUtil.write(result.toString(),
+                                UrlUtil.SOURCE_LIST_TXT, bookId, 0);
+                        List<SummaryDto> summarylist = JsonUtils.getSummaryListByJson(result.toString());
+//                        if (summarylist.size() > 0) {
+//                            if (sourceNum > summarylist.size() - 1) {
+//                                sourceNum = summarylist.size() - 1;
+//                            }
+                        totalChapterCount = summarylist.get(sourceNum)
+                                .getChaptersCount();
+                        getChapterResource(summarylist.get(sourceNum).get_id());
+//                        }
                     }
 
-                    totalChapterCount = summarylist.get(sourceNum)
-                            .getChaptersCount();
-                    getChapterResource(summarylist.get(sourceNum).get_id());
+                    @Override
+                    public void onFailure(Throwable t, String strMsg) {
+                        HttpProces.failHttp();
+                        showToast("未能请求到数据，请检查网络");
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                load.setText("未能请求到数据，请检查网络");
+                                load.setContentDescription("未能请求到数据，请检查网络");
+                            }
+                        });
+                    }
                 }
-            }
 
-            @Override
-            public void onFailure(Throwable t, String strMsg) {
-                HttpProces.failHttp();
-                totalChapterCount = 1000;
-                setContent("未能获取到资源，请检查网络吧");
-
-            }
-        });
+        );
     }
 
     /**
@@ -212,16 +244,18 @@ public class ContentActivity extends ContentSplitActivity {
         String viewChaptersUrl = "";
         viewChaptersUrl = UrlUtil.VIEW_CHAPTERS
                 + id + "?view=chapters";
-
         StringRequest jrChapterLists = new StringRequest(Request.Method.GET,
                 viewChaptersUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(final String response) {
-                ChapterList = JsonUtils.getChapterListByJson(response.toString());
-                if (ChapterList.size() > 0 && currentPosition < ChapterList.size() - 2) {
-                    getContentResource(ChapterList.get(currentPosition)
+                FileUtil.write(response.toString(),
+                        UrlUtil.CHAPTER_LIST_TXT, bookId, sourceNum);
+                List<ChapterDto> chapterList = JsonUtils.getChapterListByJson(response.toString());
+                setChapterList(chapterList);
+                if (chapterList.size() > 0 && currentPosition < chapterList.size() - 2) {
+                    getContentResource(chapterList.get(currentPosition)
                             .getLink(), currentPosition, true);
-                    getContentResource(ChapterList.get(currentPosition + 1)
+                    getContentResource(chapterList.get(currentPosition + 1)
                             .getLink(), currentPosition + 1, false);
                 }
 
@@ -231,6 +265,13 @@ public class ContentActivity extends ContentSplitActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 showToast("未能请求到数据，请检查网络");
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        load.setText("未能请求到数据，请检查网络");
+                        load.setContentDescription("未能请求到数据，请检查网络");
+                    }
+                });
             }
         }) {
             @Override
@@ -247,65 +288,6 @@ public class ContentActivity extends ContentSplitActivity {
         mRequestQueue.add(jrChapterLists);
     }
 
-    /**
-     * @param
-     * @param newBookId
-     * @return 网站资源列表
-     */
-//    private void getChapterResource(final String newBookId) {
-//        new Thread(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                HttpURLConnection cumtConnection;
-//                InputStream urlStream = null;
-//                BufferedReader reader = null;
-//                String result = "";
-//                try {
-//                    cumtConnection = (HttpURLConnection) new URL(
-//                            UrlUtil.RESOURCE_BOOK_ID + newBookId
-//                                    + "?view=chapters").openConnection();
-//                    cumtConnection.setRequestProperty("User-Agent",
-//                            "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
-//                    urlStream = cumtConnection.getInputStream();
-//                    reader = new BufferedReader(
-//                            new InputStreamReader(urlStream, "UTF-8"));
-//                    String line;
-//                    while ((line = reader.readLine()) != null) {
-//                        result = result + line;
-//                        Log.d("XXXXXXXXXX", line.toString());
-//                    }
-//                } catch (MalformedURLException e) {
-//                    e.printStackTrace();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                } finally {
-//                    try {
-//                        reader.close();
-//                        urlStream.close();
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//                if (result.equals("")) {
-//                    setContent("未能获取到资源，在更多选项中选择其他资源试试吧");
-//                } else {
-//                    try {
-//                        ChapterList = JsonUtils.getChapterListByJson(result);
-//                        getContentResource(ChapterList.get(currentPosition)
-//                                .getLink(), currentPosition, true);
-////                        getContentResource(ChapterList.get(currentPosition + 1)
-////                                .getLink(), currentPosition + 1, false);
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                        setContent("未能获取到资源，在更多选项中选择其他资源试试吧");
-//                    }
-//                }
-//            }
-//        }
-//        ).start();
-//    }
     private void getContentResource(final String link, final int chapterPosition, final boolean isFirst) {
         String url = "";
         String url1 = "http://chapter2.zhuishushenqi.com";
@@ -334,11 +316,10 @@ public class ContentActivity extends ContentSplitActivity {
             @Override
             public void onErrorResponse(
                     VolleyError error) {
-                Log.d("XXXXXXXXsssXX",error.toString());
+                Log.d("XXXXXXXXsssXX", error.toString());
                 isFirstSetContent(error.toString(), isFirst);
             }
-        })
-        {
+        }) {
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> headers = new HashMap<String, String>();
@@ -361,7 +342,7 @@ public class ContentActivity extends ContentSplitActivity {
             str = str.replace("\n", "");
             if (isContainChinese(str) && !str.equals("")) {
                 strContent = (currentPosition + 1) + "。"
-                        + ChapterList.get(currentPosition).getTitle() + "：" + "\n正文："
+                        + chapterList.get(currentPosition).getTitle() + "：" + "\n正文："
                         + str;
             } else {
                 strContent = "未能获取到资源，在更多选项中选择其他资源试试吧";
@@ -401,11 +382,8 @@ public class ContentActivity extends ContentSplitActivity {
         @Override
         protected void onPostExecute(String data) {
             super.onPostExecute(data);
-            // isCollector = true;
-            String result;
             try {
-                result = FileUtil.read(filePath).toString();
-                json3Gson(result);
+                json3Gson(FileUtil.read(filePath).toString());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -425,7 +403,7 @@ public class ContentActivity extends ContentSplitActivity {
             str = str.replace("\n", "");
             if (isContainChinese(str)) {
                 strContent = (currentPosition + 1) + "。"
-                        + ChapterList.get(currentPosition).getTitle() + "：" + "\n正文："
+                        + chapterList.get(currentPosition).getTitle() + "：" + "\n正文："
                         + str;
             }
 
@@ -436,9 +414,6 @@ public class ContentActivity extends ContentSplitActivity {
         }
 
         if (isCollector) {
-            // countPage = intent.getIntExtra("countPage", 0);
-            // sentenceIndex = intent.getIntExtra("sentenceIndex", -1);
-            // position = intent.getIntExtra("position", 0);
             isCollector = false;
         } else {
             countPage = 0;
@@ -448,33 +423,6 @@ public class ContentActivity extends ContentSplitActivity {
 
         return strContent;
     }
-
-//	// 从sd卡读取数据并解析显示
-//	class readChapterFromSDcard extends AsyncTask<Void, Void, String> {
-//
-//		@Override
-//		protected String doInBackground(Void... params) {
-//			try {
-//				String result = FileUtil.read(chapterFilePath).toString();
-//				ChapterList = JsonUtils.getChapterListByJson(result);
-//				totalChapterCount = ChapterList.size();
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//			return null;
-//		}
-//
-//		@Override
-//		protected void onPostExecute(String result) {
-//			super.onPostExecute(result);
-//			if (!strContent.equals("")) {
-//				setContent(strContent);
-//			} else {
-//				showToast("小说内容出错，建议删除重新下载该资源");
-//			}
-//		}
-//
-//	}
 
     /**
      * 下一条资讯
@@ -492,33 +440,18 @@ public class ContentActivity extends ContentSplitActivity {
                 load.setVisibility(View.VISIBLE);
             }
         });
-//        if (isDownLoad != -1) {
         dwonLoadNextChapter();
-//            return;
-//        } else {
-//            if (currentPosition < totalChapterCount - 1) {
-//                currentPosition++;
-//                getContentResource(ChapterList.get(currentPosition).getLink(),false);
-//            } else {
-//                showToast("没有下一章了");
-//                load.setVisibility(View.GONE);
-//                finish();
-//            }
-
-//    }
-
     }
 
     private void dwonLoadNextChapter() {
         if (currentPosition < totalChapterCount - 1) {
             currentPosition++;
             playPlayback();
-            if (currentPosition + 1 < totalChapterCount - 2) {
-                try {
-                    getContentResource(ChapterList.get(currentPosition + 1).getLink(), currentPosition + 1, false);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    setContent("未能获取到资源，在更多选项中选择其他资源试试吧");
+            int nextPosition = currentPosition + 1;
+            String path = FilePathUtil.getFilePath(bookId, nextPosition, sourceNum);
+            if (!FileUtil.fileIsExists(path)) {
+                if (nextPosition < (chapterList.size() - 1)) {
+                    getContentResource(chapterList.get(nextPosition).getLink(), nextPosition, false);
                 }
             }
         } else {
@@ -542,19 +475,13 @@ public class ContentActivity extends ContentSplitActivity {
     }
 
     public void preChapter() {
-
-        load.setVisibility(View.VISIBLE);
-//        if (isDownLoad != -1) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                load.setVisibility(View.VISIBLE);
+            }
+        });
         dwonLoadPreChapter();
-//        return;
-//        } else {
-//            currentPosition--;
-//            if (currentPosition < 0) {
-//                currentPosition = 0;
-//                showToast("没有上一章了");
-//            }
-//            getContentResource(ChapterList.get(currentPosition).getLink(),false);
-//        }
 
     }
 
@@ -677,43 +604,6 @@ public class ContentActivity extends ContentSplitActivity {
         intentMore.setClass(ContentActivity.this, PromptActivity.class);
         startActivityForResult(intentMore, 2);
 
-    }
-
-    private void dialog() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                ContentActivity.this);
-        alertDialogBuilder.setMessage("您还未收藏该小说，是否收藏");
-        alertDialogBuilder.setTitle("提示");
-        alertDialogBuilder.setPositiveButton("收藏。",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(final DialogInterface dialog, int which) {
-                        CollectorDto collector = new CollectorDto(bookId,
-                                title, currentPosition, -1, new Date(),
-                                totalChapterCount, countPage, sentenceIndex,
-                                position, source);
-                        db.save(collector);
-                        appSpeaker.speech("收藏成功", new Callback() {
-                            @Override
-                            public void onDone() {
-                                super.onDone();
-                                showToast("收藏成功");
-                                dialog.dismiss();
-                                ContentActivity.this.finish();
-                            }
-                        });
-
-                    }
-                });
-        alertDialogBuilder.setNegativeButton("取消。",
-                new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        ContentActivity.this.finish();
-                    }
-                });
-        alertDialogBuilder.create().show();
     }
 
     // 判断是否收藏过

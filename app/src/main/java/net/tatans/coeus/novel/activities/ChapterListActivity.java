@@ -56,7 +56,7 @@ public class ChapterListActivity extends BaseActivity implements
     private TextView tv_loading;
     private TitleAdapter listAdapter;
     private String title, chapterFilePath, sourceFilePath;
-    private int isDownLoad,currentPosition;
+    private int isDownLoad, currentPosition;
     private List<String> titleList = new ArrayList<String>();
     private List<Integer> sortList = new ArrayList<Integer>();
     Handler handler = new Handler();
@@ -74,6 +74,7 @@ public class ChapterListActivity extends BaseActivity implements
         db = TatansDb.create("MyCollector");
         setContentView(R.layout.list);
         lv_one_list = (ListView) findViewById(R.id.lv_main);
+        lv_one_list.setOnItemClickListener(this);
         tv_loading = (TextView) findViewById(R.id.tv_loading);
         tv_loading.setOnHoverListener(new View.OnHoverListener() {
             @Override
@@ -104,54 +105,52 @@ public class ChapterListActivity extends BaseActivity implements
             source = "0";
         }
         sourceNum = Integer.parseInt(source);
-        init();
-        lv_one_list.setOnItemClickListener(this);
+
+//        init();
+        new readSummaryListFromSDcard().execute();
 
     }
 
-    private void init() {
-        sourceFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.SOURCE_LIST_TXT, 0);
-        if (isDownLoad == 1 && FileUtil.fileIsExists(sourceFilePath)
-                || isDownLoad == 3 && FileUtil.fileIsExists(sourceFilePath)
-                || isDownLoad == 0 && FileUtil.fileIsExists(sourceFilePath)) {
-            // 如果资源列表txt存在读取资源列表
-            new readSummaryListFromSDcard().execute();
-
-        } else {
-            // 网络请求
-            getSummaryResource(this, mRequestQueue, bookId);
-        }
-
-    }
+//    private void init() {
+//        sourceFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.SOURCE_LIST_TXT, 0);
+//        if (FileUtil.fileIsExists(sourceFilePath)) {
+//            // 如果资源列表txt存在读取资源列表
+//            new readSummaryListFromSDcard().execute();
+//        } else {
+//            // 网络请求
+//            getSummaryResource(this, mRequestQueue, bookId);
+//        }
+//
+//    }
 
     class readSummaryListFromSDcard extends AsyncTask<Void, Void, String> {
 
         @Override
         protected String doInBackground(Void... params) {
             try {
-                String result = FileUtil.read(sourceFilePath).toString();
-                summarylist = JsonUtils.getSummaryListByJson(result);
-                if (summarylist.size() > 0) {
-                    if (sourceNum > summarylist.size() - 1) {
-                        sourceNum = summarylist.size() - 1;
-                    }
-                    chapterFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.CHAPTERLIST_TXT, sourceNum);
-                    if (isDownLoad == 3) {
-                        json2Gson("");
-                    }
-                    if (isDownLoad == 1 && FileUtil.fileIsExists(chapterFilePath)
-                            || isDownLoad == 3 && FileUtil.fileIsExists(chapterFilePath)
-                            || isDownLoad == 0 && FileUtil.fileIsExists(chapterFilePath)) {
-                        // 如果章节列表txt存在读取章节列表
-                        String mResult = FileUtil.read(chapterFilePath).toString();
-                        json2Gson(mResult);
-                    } else {
-                        // 网络请求
-                        getSummaryResource(ChapterListActivity.this, mRequestQueue, bookId);
-                    }
+//                String result = FileUtil.read(sourceFilePath).toString();
+//                summarylist = JsonUtils.getSummaryListByJson(result);
+//                if (summarylist.size() > 0) {
+//                    if (sourceNum > summarylist.size() - 1) {
+//                        sourceNum = summarylist.size() - 1;
+//                    }
+                if (isDownLoad == 3) {
+                    json2Gson("");
+                    return null;
                 }
+                chapterFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.CHAPTER_LIST_TXT, sourceNum);
+                if (FileUtil.fileIsExists(chapterFilePath)) {
+                    // 如果章节列表txt存在读取章节列表
+                    String mResult = FileUtil.read(chapterFilePath).toString();
+                    json2Gson(mResult);
+                } else {
+                    // 网络请求
+                    getSummaryResource(ChapterListActivity.this, mRequestQueue, bookId);
+                }
+//             }
             } catch (IOException e) {
                 e.printStackTrace();
+                getSummaryResource(ChapterListActivity.this, mRequestQueue, bookId);
             }
             return null;
         }
@@ -181,7 +180,6 @@ public class ChapterListActivity extends BaseActivity implements
                     if (sourceNum > summarylist.size() - 1) {
                         sourceNum = summarylist.size() - 1;
                     }
-
                     totalChapterCount = summarylist.get(sourceNum)
                             .getChaptersCount();
                     getChapterResource(summarylist.get(sourceNum).get_id());
@@ -323,24 +321,24 @@ public class ChapterListActivity extends BaseActivity implements
 	/*
      * @Override public void up() { if (pageCount > 1) {
 	 * TatansToast.showAndCancel(this, "双指左右滑动可翻页"); } }
-	 * 
+	 *
 	 * @Override public void left() { currentPage++; if (currentPage >
 	 * pageCount) { currentPage = pageCount; showToast("没有下一页了"); } else {
 	 * showToast("当前所在第" + currentPage + "页，共" + pageCount + "页");
 	 * setListData();
-	 * 
+	 *
 	 * }
-	 * 
+	 *
 	 * }
-	 * 
+	 *
 	 * @Override public void right() { currentPage--; if (currentPage < 1) {
 	 * currentPage = 1; showToast("没有上一页了");
-	 * 
+	 *
 	 * } else { showToast("当前所在第" + currentPage + "页，共" + pageCount + "页");
 	 * setListData();
-	 * 
+	 *
 	 * } }
-	 * 
+	 *
 	 * @Override public void down() { if (pageCount > 1) {
 	 * TatansToast.showAndCancel(this, "双指左右滑动可翻页"); } }
 	 */

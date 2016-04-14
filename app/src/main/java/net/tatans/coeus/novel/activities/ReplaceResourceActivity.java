@@ -105,9 +105,7 @@ public class ReplaceResourceActivity extends BaseActivity implements
 
     private void init() {
         sourceListFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.SOURCE_LIST_TXT, 0);
-        if (isDownLoad == 1 && FileUtil.fileIsExists(sourceListFilePath)
-                || isDownLoad == 3 && FileUtil.fileIsExists(sourceListFilePath)
-                || isDownLoad == 0 && FileUtil.fileIsExists(sourceListFilePath)) {
+        if (FileUtil.fileIsExists(sourceListFilePath)) {
             // 如果章节列表txt存在读取章节列表
             new readFromSDcard().execute();
 
@@ -125,28 +123,24 @@ public class ReplaceResourceActivity extends BaseActivity implements
             try {
                 String result = FileUtil.read(sourceListFilePath).toString();
                 summarylist = JsonUtils.getSummaryListByJson(result);
-                String chapterFilePath;
+//                String chapterFilePath;
                 for (int i = 0; i < summarylist.size(); i++) {
-                    chapterFilePath = FilePathUtil.getFilePath(bookId, -1, i);
-                    if (FileUtil.fileIsExists(chapterFilePath)) {
-                        isDownloadList.add("已下载");
-                    } else {
-                        isDownloadList.add("未下载");
-                    }
                     titleList.add(summarylist.get(i).getName());
                 }
-                if (summarylist.size() > 0) {
-                    if (sourceNum > summarylist.size() - 1) {
-                        sourceNum = summarylist.size() - 1;
-                    }
+//                if (summarylist.size() > 0) {
+//                    if (sourceNum > summarylist.size() - 1) {
+//                        sourceNum = summarylist.size() - 1;
+//                    }
 //
-                    totalChapterCount = summarylist.get(sourceNum)
-                            .getChaptersCount();
+                totalChapterCount = summarylist.get(sourceNum)
+                        .getChaptersCount();
 
-                    handler.post(result2json);
-                }
+                handler.post(result2json);
+//                }
             } catch (IOException e) {
                 e.printStackTrace();
+                // 网络请求
+                getSummaryResource(ReplaceResourceActivity.this, mRequestQueue, bookId);
             }
             return null;
         }
@@ -175,14 +169,14 @@ public class ReplaceResourceActivity extends BaseActivity implements
                 for (int i = 0; i < summarylist.size(); i++) {
                     titleList.add(summarylist.get(i).getName());
                 }
-                if (summarylist.size() > 0) {
-                    if (sourceNum > summarylist.size() - 1) {
-                        sourceNum = summarylist.size() - 1;
-                    }
-                    totalChapterCount = summarylist.get(sourceNum)
-                            .getChaptersCount();
-                    handler.post(result2json);
-                }
+//                if (summarylist.size() > 0) {
+//                    if (sourceNum > summarylist.size() - 1) {
+//                        sourceNum = summarylist.size() - 1;
+//                    }
+                totalChapterCount = summarylist.get(sourceNum)
+                        .getChaptersCount();
+                handler.post(result2json);
+//                }
             }
 
             @Override
@@ -205,11 +199,11 @@ public class ReplaceResourceActivity extends BaseActivity implements
     };
 
     public void setListData() {
-        if (titleList.size() == 0) {
-            showToast("未能获取到资源列表，请检查网络");
-            finish();
-            return;
-        }
+//        if (summarylist.size() == 0) {
+//            showToast("未能获取到资源列表，请检查网络");
+//            finish();
+//            return;
+//        }
         showToast("当前资源" + summarylist.get(sourceNum).getName());
         int to = (int) (AppConstants.APP_PAGE_SIZE + AppConstants.APP_PAGE_SIZE
                 * (currentPage - 1));
@@ -231,6 +225,14 @@ public class ReplaceResourceActivity extends BaseActivity implements
             return;
         }
         CollectorDto collerctor = db.findById(bookId, CollectorDto.class);
+        String filePath = Environment.getExternalStorageDirectory()
+                + "/tatans/novel/" + bookId;
+        final File file = new File(filePath);
+        new Thread(new Runnable() {
+            public void run() {
+                FileUtil.delete(file);
+            }
+        }).start();
 
         int isDownLoad;
         if (collerctor == null) {

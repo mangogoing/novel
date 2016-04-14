@@ -84,7 +84,6 @@ public class ContentSplitActivity extends BaseActivity {
     protected String title;
     protected boolean isCollector;
     protected int countPage;
-    protected int totalChapterCount;
     public static int sentenceIndex = -1;// 句子的下标
 
     public void setsResult(String sResult) {

@@ -58,7 +58,7 @@ public class UrlUtil {
 	public static final String FINISH_ACTION = "net.tatans.coeus.novel.DownLoadService.finish";
 
 	/** 下载时章节列表保存文件.TXT位置 */
-	public static final int CHAPTERLIST_TXT = -1;
+	public static final int CHAPTER_LIST_TXT = -1;
 	/** 下载时章节列表保存文件.TXT位置 */
 	public static final int SOURCE_LIST_TXT = -2;
 

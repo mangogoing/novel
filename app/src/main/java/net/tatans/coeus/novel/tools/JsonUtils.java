@@ -65,7 +65,6 @@ public class JsonUtils {
 
 	public static List<SummaryDto> getSummaryListByJson(String result) {
 		List<SummaryDto> list = new ArrayList<>();
-
 		try {
 			JSONArray jsonArray = new JSONArray(result);
 			SummaryDto summaryDto = null;
@@ -84,11 +83,9 @@ public class JsonUtils {
 				summaryDto.setHost(item.getString("host"));
 				list.add(summaryDto);
 			}
-
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-
 		return list;
 	}
 

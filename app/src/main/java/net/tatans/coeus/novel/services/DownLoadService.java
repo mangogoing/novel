@@ -192,7 +192,7 @@ public class DownLoadService extends Service {
                             @Override
                             public void run() {
                                 FileUtil.write(response.toString(),
-                                        UrlUtil.CHAPTERLIST_TXT, bookId, sourceNum);
+                                        UrlUtil.CHAPTER_LIST_TXT, bookId, sourceNum);
                             }
                         }).start();
                         downLoadChapters(response);
