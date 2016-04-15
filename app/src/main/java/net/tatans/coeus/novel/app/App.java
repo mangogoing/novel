@@ -2,7 +2,6 @@ package net.tatans.coeus.novel.app;
 
 import android.content.IntentFilter;
 
-import net.tatans.coeus.SearchOOM.TatansSearchOOM;
 import net.tatans.coeus.network.tools.TatansApplication;
 import net.tatans.coeus.network.tools.TatansDb;
 import net.tatans.coeus.novel.tools.UrlUtil;
