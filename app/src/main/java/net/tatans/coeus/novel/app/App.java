@@ -25,7 +25,7 @@ public class App extends TatansApplication {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		TatansSearchOOM.install(this);
+//		TatansSearchOOM.install(this);
 		/*
 		 * db = TatansDb.create(this, "MyCollector"); if(progressReciver==null){
 		 * progressReciver=new MyDownLoadProgressReciver(); }
