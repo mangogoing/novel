@@ -84,9 +84,15 @@ public class DownLoadService extends Service {
             title = intent.getStringExtra("title");
             sourceNum = Integer.parseInt(intent.getStringExtra("source"));
             mRequestQueue = Volley.newRequestQueue(this);
-            showToast("开始缓存" + title);
+            showToast("准备缓存" + title);
             if (bookId != null) {
-                init();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        showToast("开始缓存" + title);
+                        init();
+                    }
+                }, 3000);
             }
         }
 
