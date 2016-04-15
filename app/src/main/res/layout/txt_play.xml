@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:text="正在请求内容，请稍后"
+        android:text="@string/loading_hint"
         android:textColor="@color/white"
         android:textSize="25sp"
         />

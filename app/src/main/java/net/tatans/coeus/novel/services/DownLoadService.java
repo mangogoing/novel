@@ -76,14 +76,15 @@ public class DownLoadService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.i(TAG, "onStartCommand");
-        Log.d("IIIIIIIIII", System.currentTimeMillis() +"");
+        Log.d("IIIIIIIIII", "-------------1------------" + System.currentTimeMillis() + "");
+
         if (intent != null) {
             chapterlist.clear();
             bookId = intent.getStringExtra("bookId");
             title = intent.getStringExtra("title");
             sourceNum = Integer.parseInt(intent.getStringExtra("source"));
             mRequestQueue = Volley.newRequestQueue(this);
-            showToast("开始缓存"+title);
+            showToast("开始缓存" + title);
             if (bookId != null) {
                 init();
             }
@@ -97,21 +98,21 @@ public class DownLoadService extends Service {
      */
     private void init() {
         String url = UrlUtil.RESOURCE_LIST + bookId;
-
         StringRequest jrTocs = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(final String response) {
+                        Log.d("IIIIIIIIII", "-------------2------------" + System.currentTimeMillis() + "");
                         /** 目錄写入.TXT文件保存 */
-                    new Thread(new Runnable() {
-                        @Override
-                       public void run() {
-                        FileUtil.write(response.toString(),
-                                UrlUtil.SOURCE_LIST_TXT, bookId, 0);
-                             }
-                    }).start();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                FileUtil.write(response.toString(),
+                                        UrlUtil.SOURCE_LIST_TXT, bookId, 0);
+                                AnalyzeTocs(response.toString());
+                            }
+                        }).start();
 
-                        AnalyzeTocs(response.toString());
 
                     }
 
@@ -170,56 +171,53 @@ public class DownLoadService extends Service {
      * 获取章节列表
      */
     private void AnalyzeTocs(final String string) {
-//        new Thread(new Runnable() {
-//
-//            @Override
-//            public void run() {
-                List<SummaryDto> summarylist = JsonUtils.getSummaryListByJson(string);
-                if (summarylist.size() > 0) {
-                    if (sourceNum > summarylist.size() - 1) {
-                        sourceNum = summarylist.size() - 1;
-                    }
-                    viewChaptersUrl = UrlUtil.VIEW_CHAPTERS
-                            + summarylist.get(sourceNum).get_id() + "?view=chapters";
-                }
 
-                StringRequest jrChapterLists = new StringRequest(Request.Method.GET,
-                        viewChaptersUrl, new Response.Listener<String>() {
+        List<SummaryDto> summarylist = JsonUtils.getSummaryListByJson(string);
+        if (summarylist.size() > 0) {
+            if (sourceNum > summarylist.size() - 1) {
+                sourceNum = summarylist.size() - 1;
+            }
+            viewChaptersUrl = UrlUtil.VIEW_CHAPTERS
+                    + summarylist.get(sourceNum).get_id() + "?view=chapters";
+        }
+
+        StringRequest jrChapterLists = new StringRequest(Request.Method.GET,
+                viewChaptersUrl, new Response.Listener<String>() {
+            @Override
+            public void onResponse(final String response) {
+                Log.d("IIIIIIIIII", "-------------3------------" + System.currentTimeMillis() + "");
+                /** 目錄写入.TXT文件保存 */
+                new Thread(new Runnable() {
                     @Override
-                    public void onResponse(final String response) {
-                        /** 目錄写入.TXT文件保存 */
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                FileUtil.write(response.toString(),
-                                        UrlUtil.CHAPTER_LIST_TXT, bookId, sourceNum);
-                            }
-                        }).start();
+                    public void run() {
+                        FileUtil.write(response.toString(),
+                                UrlUtil.CHAPTER_LIST_TXT, bookId, sourceNum);
                         downLoadChapters(response);
                     }
+                }).start();
 
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        showToast("未能请求到数据，请检查网络");
-                        stopSelf();
-                    }
-                }) {
-                    @Override
-                    public Map<String, String> getHeaders() {
-                        Map<String, String> headers = new HashMap<String, String>();
-                        headers.put("User-Agent",
-                                "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
-                        headers.put("Content-Encoding", "gzip");
-                        headers.put("Content-Type", " application/json; charset=utf-8");
-                        return headers;
-                    }
+            }
 
-                };
-                mRequestQueue.add(jrChapterLists);
-//            }
-//
-//        }).start();
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                showToast("未能请求到数据，请检查网络");
+                stopSelf();
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() {
+                Map<String, String> headers = new HashMap<String, String>();
+                headers.put("User-Agent",
+                        "YouShaQi/2.23.2 (iPhone; iOS 9.2; Scale/2.00)");
+                headers.put("Content-Encoding", "gzip");
+                headers.put("Content-Type", " application/json; charset=utf-8");
+                return headers;
+            }
+
+        };
+        mRequestQueue.add(jrChapterLists);
+
     }
 
     @Override
@@ -252,13 +250,11 @@ public class DownLoadService extends Service {
     Handler handler = new Handler();
 
 
-
     // 開啟volley网络下載章節內容
     public void downLoadChapters(String response) {
         JSONObject json;
         try {
             json = new JSONObject(response);
-            Log.d("IIIIIIIIII", System.currentTimeMillis() +"");
             JSONArray array;
             try {
                 array = json.getJSONArray("chapters");
@@ -287,6 +283,7 @@ public class DownLoadService extends Service {
 
                                     @Override
                                     public void onResponse(final JSONObject response) {
+                                        Log.d("IIIIIIIIII", "-------------4------------" + System.currentTimeMillis() + "");
                                         new Thread(new Runnable() {
                                             @Override
                                             public void run() {
@@ -321,7 +318,7 @@ public class DownLoadService extends Service {
                                     }
                                 }).start();
                             }
-                        }){
+                        }) {
                             @Override
                             public Map<String, String> getHeaders() {
                                 Map<String, String> headers = new HashMap<String, String>();

@@ -64,6 +64,7 @@ public class ContentActivity extends ContentSplitActivity {
     private int sourceNum = 0;
     private String source;
     private int totalChapterCount = 0;
+    private boolean isFinalChapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,8 +116,10 @@ public class ContentActivity extends ContentSplitActivity {
                         List<SummaryDto> summarylist = JsonUtils.getSummaryListByJson(result.toString());
                         int count = summarylist.get(sourceNum)
                                 .getChaptersCount();
-                        Log.d(TAG,"本地共有章节："+totalChapterCount+"---"+"最新共有章节："+count);
-                        totalChapterCount = count;
+                        Log.d(TAG, "本地共有章节：" + totalChapterCount + "---" + "最新共有章节：" + count);
+                        if (count > totalChapterCount) {
+                            totalChapterCount = count;
+                        }
                     }
 
                     @Override
@@ -223,14 +226,15 @@ public class ContentActivity extends ContentSplitActivity {
                     @Override
                     public void onFailure(Throwable t, String strMsg) {
                         HttpProces.failHttp();
-                        showToast("未能请求到数据，请检查网络");
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                load.setText("未能请求到数据，请检查网络");
-                                load.setContentDescription("未能请求到数据，请检查网络");
-                            }
-                        });
+                        setContent("未能请求到数据，请检查网络，若网络正常，在更多选项中换源试试吧。");
+//                        showToast("未能请求到数据，请检查网络");
+//                        handler.post(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                load.setText("未能请求到数据，请检查网络");
+//                                load.setContentDescription("未能请求到数据，请检查网络");
+//                            }
+//                        });
                     }
                 }
 
@@ -257,6 +261,9 @@ public class ContentActivity extends ContentSplitActivity {
                             .getLink(), currentPosition, true);
                     getContentResource(chapterList.get(currentPosition + 1)
                             .getLink(), currentPosition + 1, false);
+                } else {
+                    getContentResource(chapterList.get(chapterList.size() - 1)
+                            .getLink(), currentPosition, true);
                 }
 
             }
@@ -264,14 +271,16 @@ public class ContentActivity extends ContentSplitActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                showToast("未能请求到数据，请检查网络");
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        load.setText("未能请求到数据，请检查网络");
-                        load.setContentDescription("未能请求到数据，请检查网络");
-                    }
-                });
+                setContent("未能请求到数据，请检查网络，若网络正常，在更多选项中换源试试吧。");
+//                handler.post(new Runnable() {
+//                    @Override
+//                    public void run() {
+//
+//                        showToast("未能请求到数据，请检查网络");
+//                        load.setText("未能请求到数据，请检查网络");
+//                        load.setContentDescription("未能请求到数据，请检查网络");
+//                    }
+//                });
             }
         }) {
             @Override
@@ -345,7 +354,7 @@ public class ContentActivity extends ContentSplitActivity {
                         + chapterList.get(currentPosition).getTitle() + "：" + "\n正文："
                         + str;
             } else {
-                strContent = "未能获取到资源，在更多选项中选择其他资源试试吧";
+                strContent = "未能请求到数据，请检查网络，若网络正常，在更多选项中换源试试吧。";
                 countPage = 0;
                 sentenceIndex = -1;
                 position = 0;
@@ -455,11 +464,11 @@ public class ContentActivity extends ContentSplitActivity {
                 }
             }
         } else {
-            showToast("没有下一章了");
-            load.setVisibility(View.GONE);
+            showToast("没有下一章了,已退出播放界面，");
             countPage = 0;
             sentenceIndex = -1;
             position = 0;
+            save();
             finish();
         }
 

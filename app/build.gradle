@@ -18,7 +18,7 @@ android {
     defaultConfig {
         manifestPlaceholders = [APP_NAME: AppName]
         applicationId "net.tatans.coeus.novel"
-        minSdkVersion 17
+        minSdkVersion 19
         targetSdkVersion 22
         versionCode version_code.toInteger()
         versionName "1.2." + version_code
@@ -89,6 +89,10 @@ android {
 
 }
 
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 1, 'minutes'
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:support-v4:22.2.1'
@@ -100,4 +104,6 @@ dependencies {
     compile 'com.belerweb:pinyin4j:2.5.0'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.umeng.analytics:analytics:latest.integration'
+    debugCompile 'net.tatans.coeus:coeus-searchOOM:1.0.0-SNAPSHOT'
+    releaseCompile 'net.tatans.coeus:coeus-searchOOM-no:1.0.0-SNAPSHOT'
 }
