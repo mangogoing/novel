@@ -85,7 +85,7 @@ public class ContentSplitActivity extends BaseActivity {
     protected boolean isCollector;
     protected int countPage;
     public static int sentenceIndex = -1;// 句子的下标
-
+    private boolean isFirstTouch = true;
     public void setsResult(String sResult) {
         this.sResult = sResult;
     }
@@ -168,7 +168,10 @@ public class ContentSplitActivity extends BaseActivity {
             public boolean onHover(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_HOVER_ENTER:
-                        showToast(getString(R.string.loading_hint));
+                        if(!isFirstTouch){
+                            showToast(getString(R.string.loading_hint));
+                        }
+                        isFirstTouch = false;
                         break;
                 }
                 return false;

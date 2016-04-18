@@ -349,7 +349,7 @@ public class ContentActivity extends ContentSplitActivity {
             String str = JsonUtils.getNovelContent(result).replaceAll(
                     " ", "");
             str = str.replace("\n", "");
-            if (isContainChinese(str) && !str.equals("")) {
+            if (isContainChinese(str) && !str.equals("") && chapterList.size() > 0) {
                 strContent = (currentPosition + 1) + "。"
                         + chapterList.get(currentPosition).getTitle() + "：" + "\n正文："
                         + str;
@@ -391,11 +391,13 @@ public class ContentActivity extends ContentSplitActivity {
         @Override
         protected void onPostExecute(String data) {
             super.onPostExecute(data);
+            String result = "";
             try {
-                json3Gson(FileUtil.read(filePath).toString());
+                result = FileUtil.read(filePath).toString();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            json3Gson(result);
             if (!strContent.equals("")) {
                 setContent(strContent);
             } else {
@@ -410,10 +412,15 @@ public class ContentActivity extends ContentSplitActivity {
         if (isDownLoad != 3) {
             String str = JsonUtils.getNovelContent(result).replaceAll(" ", "");
             str = str.replace("\n", "");
-            if (isContainChinese(str)) {
+            if (isContainChinese(str) && chapterList.size() > 0) {
                 strContent = (currentPosition + 1) + "。"
                         + chapterList.get(currentPosition).getTitle() + "：" + "\n正文："
                         + str;
+            } else {
+                countPage = 0;
+                sentenceIndex = -1;
+                position = 0;
+                return strContent = "";
             }
 
         } else {

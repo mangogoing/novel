@@ -38,7 +38,7 @@ public class BookListActivity extends BaseActivity implements
 	private int currentPage = 1;
 	private List<BookListDto> ClassificatList = new ArrayList<BookListDto>();
 	private boolean isSpeak;
-
+	private boolean isFirstTouch = true;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -50,7 +50,10 @@ public class BookListActivity extends BaseActivity implements
 			public boolean onHover(View v, MotionEvent event) {
 				switch (event.getAction()) {
 					case MotionEvent.ACTION_HOVER_ENTER:
-						showToast(getString(R.string.loading_hint));
+						if(!isFirstTouch){
+							showToast(getString(R.string.loading_hint));
+						}
+						isFirstTouch = false;
 						break;
 				}
 				return false;

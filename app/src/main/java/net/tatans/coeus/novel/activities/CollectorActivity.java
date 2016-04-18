@@ -59,6 +59,7 @@ public class CollectorActivity extends BaseActivity {
     private DownLoadProgressReciver downLoadProgressReciver = null;
     private ProgressDialog proDia;
     private TextView tv_loading;
+    private boolean isFirstTouch = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +79,10 @@ public class CollectorActivity extends BaseActivity {
             public boolean onHover(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_HOVER_ENTER:
-                        showToast(getString(R.string.loading_hint));
+                        if(!isFirstTouch){
+                            showToast(getString(R.string.loading_hint));
+                        }
+                        isFirstTouch = false;
                         break;
                 }
                 return false;

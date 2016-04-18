@@ -46,6 +46,7 @@ public class ThemeListActivity extends BaseActivity {
 	private String id;
 	private String title;
 	private boolean isSpeak;
+	private boolean isFirstTouch = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +62,10 @@ public class ThemeListActivity extends BaseActivity {
 			public boolean onHover(View v, MotionEvent event) {
 				switch (event.getAction()) {
 					case MotionEvent.ACTION_HOVER_ENTER:
-						showToast(getString(R.string.loading_hint));
+						if(!isFirstTouch){
+							showToast(getString(R.string.loading_hint));
+						}
+						isFirstTouch = false;
 						break;
 				}
 				return false;
