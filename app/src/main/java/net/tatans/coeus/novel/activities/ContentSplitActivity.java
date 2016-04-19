@@ -754,7 +754,7 @@ public class ContentSplitActivity extends BaseActivity {
 //                    if (speaker != null && isSpeaking) {
 //                        speaker.pause();
 //                    }
-                    speakPause();
+                    speakPauseNoTips();
                     break;
                 default:
                     break;
@@ -771,7 +771,9 @@ public class ContentSplitActivity extends BaseActivity {
                 if (isSpeaking) {
                     showToast("暂停播放");
                 }
-                speaker.pause();
+                if(speaker!=null){
+                    speaker.pause();
+                }
                 // isStops = false;
                 isSpeaking = false;
                 mAudioManagerUtil.abandonAudioFocus();
@@ -788,7 +790,9 @@ public class ContentSplitActivity extends BaseActivity {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                speaker.pause();
+                if(speaker!=null){
+                    speaker.pause();
+                }
                 // isStops = false;
                 isSpeaking = false;
                 mAudioManagerUtil.abandonAudioFocus();
