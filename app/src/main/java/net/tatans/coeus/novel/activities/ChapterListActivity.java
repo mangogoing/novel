@@ -82,7 +82,7 @@ public class ChapterListActivity extends BaseActivity implements
             public boolean onHover(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_HOVER_ENTER:
-                        if(!isFirstTouch){
+                        if (!isFirstTouch) {
                             showToast(getString(R.string.loading_hint));
                         }
                         isFirstTouch = false;
@@ -131,36 +131,28 @@ public class ChapterListActivity extends BaseActivity implements
 
         @Override
         protected String doInBackground(Void... params) {
-            try {
-//                String result = FileUtil.read(sourceFilePath).toString();
-//                summarylist = JsonUtils.getSummaryListByJson(result);
-//                if (summarylist.size() > 0) {
-//                    if (sourceNum > summarylist.size() - 1) {
-//                        sourceNum = summarylist.size() - 1;
-//                    }
-                if (isDownLoad == 3) {
-                    json2Gson("");
-                    return null;
-                }
-                chapterFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.CHAPTER_LIST_TXT, sourceNum);
-                if (FileUtil.fileIsExists(chapterFilePath)) {
-                    // 如果章节列表txt存在读取章节列表
-                    String mResult = FileUtil.read(chapterFilePath).toString();
+            if (isDownLoad == 3) {
+                json2Gson("");
+                return null;
+            }
+            chapterFilePath = FilePathUtil.getFilePath(bookId, UrlUtil.CHAPTER_LIST_TXT, sourceNum);
+            if (FileUtil.fileIsExists(chapterFilePath)) {
+                // 如果章节列表txt存在读取章节列表
+                String mResult = "";
+                try {
+                    mResult = FileUtil.read(chapterFilePath).toString();
                     json2Gson(mResult);
-                } else {
-                    // 网络请求
+                } catch (IOException e) {
                     getSummaryResource(ChapterListActivity.this, mRequestQueue, bookId);
                 }
-//             }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } else {
+                // 网络请求
                 getSummaryResource(ChapterListActivity.this, mRequestQueue, bookId);
+
             }
             return null;
         }
-
     }
-
 
     List<SummaryDto> summarylist;
 
@@ -263,8 +255,6 @@ public class ChapterListActivity extends BaseActivity implements
             for (int i = 0; i < totalChapterCount; i++) {
                 sortList.add(i + 1);
             }
-
-
             handler.post(result2json);
         } else {
             ChapterList = JsonUtils.getChapterListByJson(result);

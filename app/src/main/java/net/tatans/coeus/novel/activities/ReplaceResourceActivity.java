@@ -77,7 +77,7 @@ public class ReplaceResourceActivity extends BaseActivity implements
             public boolean onHover(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_HOVER_ENTER:
-                        if(!isFirstTouch){
+                        if (!isFirstTouch) {
                             showToast(getString(R.string.loading_hint));
                         }
                         isFirstTouch = false;
@@ -131,16 +131,18 @@ public class ReplaceResourceActivity extends BaseActivity implements
                 for (int i = 0; i < summarylist.size(); i++) {
                     titleList.add(summarylist.get(i).getName());
                 }
-//                if (summarylist.size() > 0) {
-//                    if (sourceNum > summarylist.size() - 1) {
-//                        sourceNum = summarylist.size() - 1;
-//                    }
-//
-                totalChapterCount = summarylist.get(sourceNum)
-                        .getChaptersCount();
+                if (summarylist.size() > 0) {
+                    if (sourceNum > summarylist.size() - 1) {
+                        sourceNum = summarylist.size() - 1;
+                    }
+                    totalChapterCount = summarylist.get(sourceNum)
+                            .getChaptersCount();
 
-                handler.post(result2json);
-//                }
+                    handler.post(result2json);
+                } else {
+                    // 网络请求
+                    getSummaryResource(ReplaceResourceActivity.this, mRequestQueue, bookId);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
                 // 网络请求
@@ -173,14 +175,17 @@ public class ReplaceResourceActivity extends BaseActivity implements
                 for (int i = 0; i < summarylist.size(); i++) {
                     titleList.add(summarylist.get(i).getName());
                 }
-//                if (summarylist.size() > 0) {
-//                    if (sourceNum > summarylist.size() - 1) {
-//                        sourceNum = summarylist.size() - 1;
-//                    }
-                totalChapterCount = summarylist.get(sourceNum)
-                        .getChaptersCount();
-                handler.post(result2json);
-//                }
+                if (summarylist.size() > 0) {
+                    if (sourceNum > summarylist.size() - 1) {
+                        sourceNum = summarylist.size() - 1;
+                    }
+                    totalChapterCount = summarylist.get(sourceNum)
+                            .getChaptersCount();
+                    handler.post(result2json);
+                }else {
+                    showToast("未能获取到资源列表，请检查网络");
+                    finish();
+                }
             }
 
             @Override

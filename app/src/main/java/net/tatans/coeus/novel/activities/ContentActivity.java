@@ -114,11 +114,13 @@ public class ContentActivity extends ContentSplitActivity {
                     public void onSuccess(String result) {
                         super.onSuccess(result);
                         List<SummaryDto> summarylist = JsonUtils.getSummaryListByJson(result.toString());
-                        int count = summarylist.get(sourceNum)
-                                .getChaptersCount();
-                        Log.d(TAG, "本地共有章节：" + totalChapterCount + "---" + "最新共有章节：" + count);
-                        if (count > totalChapterCount) {
-                            totalChapterCount = count;
+                        if (summarylist.size() > 0) {
+                            int count = summarylist.get(sourceNum)
+                                    .getChaptersCount();
+                            Log.d(TAG, "本地共有章节：" + totalChapterCount + "---" + "最新共有章节：" + count);
+                            if (count > totalChapterCount) {
+                                totalChapterCount = count;
+                            }
                         }
                     }
 
@@ -210,31 +212,28 @@ public class ContentActivity extends ContentSplitActivity {
                     @Override
                     public void onSuccess(String result) {
                         super.onSuccess(result);
-                        FileUtil.write(result.toString(),
-                                UrlUtil.SOURCE_LIST_TXT, bookId, 0);
                         List<SummaryDto> summarylist = JsonUtils.getSummaryListByJson(result.toString());
-//                        if (summarylist.size() > 0) {
-//                            if (sourceNum > summarylist.size() - 1) {
-//                                sourceNum = summarylist.size() - 1;
-//                            }
-                        totalChapterCount = summarylist.get(sourceNum)
-                                .getChaptersCount();
-                        getChapterResource(summarylist.get(sourceNum).get_id());
-//                        }
+                        if (summarylist.size() > 0) {
+                            FileUtil.write(result.toString(),
+                                    UrlUtil.SOURCE_LIST_TXT, bookId, 0);
+                            if (sourceNum > summarylist.size() - 1) {
+                                sourceNum = summarylist.size() - 1;
+                            }
+                            totalChapterCount = summarylist.get(sourceNum)
+                                    .getChaptersCount();
+                            getChapterResource(summarylist.get(sourceNum).get_id());
+                        } else {
+                            totalChapterCount = 10000;
+                            setContent("未能请求到数据，请检查网络，若网络正常，在更多选项中换源试试吧。");
+                        }
                     }
 
                     @Override
                     public void onFailure(Throwable t, String strMsg) {
                         HttpProces.failHttp();
+                        totalChapterCount = 10000;
                         setContent("未能请求到数据，请检查网络，若网络正常，在更多选项中换源试试吧。");
-//                        showToast("未能请求到数据，请检查网络");
-//                        handler.post(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                load.setText("未能请求到数据，请检查网络");
-//                                load.setContentDescription("未能请求到数据，请检查网络");
-//                            }
-//                        });
+
                     }
                 }
 
@@ -252,11 +251,11 @@ public class ContentActivity extends ContentSplitActivity {
                 viewChaptersUrl, new Response.Listener<String>() {
             @Override
             public void onResponse(final String response) {
-                FileUtil.write(response.toString(),
-                        UrlUtil.CHAPTER_LIST_TXT, bookId, sourceNum);
                 List<ChapterDto> chapterList = JsonUtils.getChapterListByJson(response.toString());
                 setChapterList(chapterList);
                 if (chapterList.size() > 0 && currentPosition < chapterList.size() - 2) {
+                    FileUtil.write(response.toString(),
+                            UrlUtil.CHAPTER_LIST_TXT, bookId, sourceNum);
                     getContentResource(chapterList.get(currentPosition)
                             .getLink(), currentPosition, true);
                     getContentResource(chapterList.get(currentPosition + 1)
@@ -271,6 +270,7 @@ public class ContentActivity extends ContentSplitActivity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                totalChapterCount = 10000;
                 setContent("未能请求到数据，请检查网络，若网络正常，在更多选项中换源试试吧。");
 //                handler.post(new Runnable() {
 //                    @Override
@@ -325,6 +325,7 @@ public class ContentActivity extends ContentSplitActivity {
             @Override
             public void onErrorResponse(
                     VolleyError error) {
+                totalChapterCount = 10000;
                 Log.d("XXXXXXXXsssXX", error.toString());
                 isFirstSetContent(error.toString(), isFirst);
             }
@@ -350,9 +351,14 @@ public class ContentActivity extends ContentSplitActivity {
                     " ", "");
             str = str.replace("\n", "");
             if (isContainChinese(str) && !str.equals("") && chapterList.size() > 0) {
-                strContent = (currentPosition + 1) + "。"
-                        + chapterList.get(currentPosition).getTitle() + "：" + "\n正文："
-                        + str;
+                try {
+                    strContent = (currentPosition + 1) + "。"
+                            + chapterList.get(currentPosition).getTitle() + "：" + "\n正文："
+                            + str;
+                } catch (Exception e) {
+                    strContent = "未能请求到数据，请检查网络，若网络正常，在更多选项中换源试试吧。";
+                }
+
             } else {
                 strContent = "未能请求到数据，请检查网络，若网络正常，在更多选项中换源试试吧。";
                 countPage = 0;
@@ -396,6 +402,8 @@ public class ContentActivity extends ContentSplitActivity {
                 result = FileUtil.read(filePath).toString();
             } catch (IOException e) {
                 e.printStackTrace();
+                setContent("小说内容出错，建议换源重新下载该资源");
+                return;
             }
             json3Gson(result);
             if (!strContent.equals("")) {
@@ -413,9 +421,13 @@ public class ContentActivity extends ContentSplitActivity {
             String str = JsonUtils.getNovelContent(result).replaceAll(" ", "");
             str = str.replace("\n", "");
             if (isContainChinese(str) && chapterList.size() > 0) {
-                strContent = (currentPosition + 1) + "。"
-                        + chapterList.get(currentPosition).getTitle() + "：" + "\n正文："
-                        + str;
+                try {
+                    strContent = (currentPosition + 1) + "。"
+                            + chapterList.get(currentPosition).getTitle() + "：" + "\n正文："
+                            + str;
+                } catch (Exception e) {
+                    strContent = "未能请求到数据，请检查网络，若网络正常，在更多选项中换源试试吧。";
+                }
             } else {
                 countPage = 0;
                 sentenceIndex = -1;
