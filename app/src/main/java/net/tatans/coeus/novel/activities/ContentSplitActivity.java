@@ -86,6 +86,7 @@ public class ContentSplitActivity extends BaseActivity {
     protected int countPage;
     public static int sentenceIndex = -1;// 句子的下标
     private boolean isFirstTouch = true;
+
     public void setsResult(String sResult) {
         this.sResult = sResult;
     }
@@ -168,7 +169,7 @@ public class ContentSplitActivity extends BaseActivity {
             public boolean onHover(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_HOVER_ENTER:
-                        if(!isFirstTouch){
+                        if (!isFirstTouch) {
                             showToast(getString(R.string.loading_hint));
                         }
                         isFirstTouch = false;
@@ -312,7 +313,9 @@ public class ContentSplitActivity extends BaseActivity {
                             ContentSplitActivity.this).pause();
                     Log.d("radio", "onFocusLossTransient---PAUSE");
                     isHourly = true;
-                    speaker.pause();
+                    if(speaker!=null){
+                        speaker.pause();
+                    }
                 }
             }
 
@@ -324,7 +327,9 @@ public class ContentSplitActivity extends BaseActivity {
                         ContentSplitActivity.this).isSpeaking()) {
                     net.tatans.coeus.speaker.Speaker.getInstance(
                             ContentSplitActivity.this).pause();
-                    speaker.pause();
+                    if(speaker!=null){
+                        speaker.pause();
+                    }
                 }
             }
 
@@ -336,7 +341,9 @@ public class ContentSplitActivity extends BaseActivity {
                         ContentSplitActivity.this).isSpeaking()) {
                     net.tatans.coeus.speaker.Speaker.getInstance(
                             ContentSplitActivity.this).pause();
-                    speaker.pause();
+                    if(speaker!=null){
+                        speaker.pause();
+                    }
                 }
             }
 
@@ -351,9 +358,14 @@ public class ContentSplitActivity extends BaseActivity {
 //                    sentenceIndex--;
                     readNextSentence();
                 } else {
-                    speaker.resume();
+                    if(speaker!=null){
+                        speaker.resume();
+                    }
+
                 }
-                speaker.resume();
+//                if(speaker!=null){
+//                    speaker.resume();
+//                }
                 isSpeaking = true;
 //                readNextSentence();
             }
@@ -404,7 +416,12 @@ public class ContentSplitActivity extends BaseActivity {
     private void rightHandler() {
         Log.e("SentenceSplitActivity", "mDetector 向右:");
         PrePage();
-        speaker.stop();
+        if(speaker!=null){
+            speaker.stop();
+        }else{
+            speaker = net.tatans.coeus.speaker.Speaker
+                    .getInstance(ContentSplitActivity.this);
+        }
         // isStops = true;
         if ("没有上一页了".equals(PRE)) {// 不会从头播报
             // appSpeaker.speech(PRE);
@@ -438,7 +455,12 @@ public class ContentSplitActivity extends BaseActivity {
         Log.e("SentenceSplitActivity", "mDetector 向左:");
         nextPage();
         // isStops = true;
-        speaker.stop();
+        if(speaker!=null){
+            speaker.stop();
+        }else{
+            speaker = net.tatans.coeus.speaker.Speaker
+                    .getInstance(ContentSplitActivity.this);
+        }
         if (flag == 2) {// 下一页
             appSpeaker.speech(NEXT, new Callback() {
                 @Override
@@ -450,7 +472,9 @@ public class ContentSplitActivity extends BaseActivity {
 
                 @Override
                 public void onDone() {
-                    speaker.resume();
+                    if(speaker!=null){
+                        speaker.resume();
+                    }
                     String[] nextSplit = adapter.reString().toString()
                             .split("，|。|！|？|；");
                     // String[] nextSplit = mEditText.reString()
@@ -460,6 +484,7 @@ public class ContentSplitActivity extends BaseActivity {
                         sentenceIndex = map.get(nextSplit[1]) - 1;
                     } catch (Exception e) {
                         nextInformation();
+                        return;
                     }
                     if ("暂停".equals(pause_or_play.getText().toString())) {
                         readNextSentence();
@@ -529,8 +554,6 @@ public class ContentSplitActivity extends BaseActivity {
                     vp.setOnPageChangeListener(changeListenner);
                     vp.setCurrentItem(1);
                     Log.d("QQQQQQQQ", adapter.reString().toString());
-                    pause_or_play.setText("暂停");
-                    pause_or_play.setContentDescription("暂停。按钮");
                     load.setVisibility(View.GONE);
                     Log.d("QQQQQQQQ", "setContent");
                     readNextSentence();
@@ -672,7 +695,7 @@ public class ContentSplitActivity extends BaseActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        if(speaker!=null){
+        if (speaker != null) {
             speaker.setSpeechOnResume(true);
         }
         TatansToast.cancel();
@@ -771,8 +794,9 @@ public class ContentSplitActivity extends BaseActivity {
                 if (isSpeaking) {
                     showToast("暂停播放");
                 }
-                if(speaker!=null){
+                if (speaker != null) {
                     speaker.pause();
+                    speaker = null;
                 }
                 // isStops = false;
                 isSpeaking = false;
@@ -790,8 +814,9 @@ public class ContentSplitActivity extends BaseActivity {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                if(speaker!=null){
+                if (speaker != null) {
                     speaker.pause();
+                    speaker = null;
                 }
                 // isStops = false;
                 isSpeaking = false;
