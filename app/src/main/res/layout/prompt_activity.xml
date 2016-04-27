@@ -25,6 +25,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:gravity="center"
+                android:singleLine="true"
+                android:ellipsize="end"
                 android:text="您未收藏该小说，是否收藏"
                 android:textColor="@color/white"
                 android:textSize="25sp" />
@@ -117,6 +119,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="17dp"
+
                 android:background="@drawable/dividing_line"
                 android:clickable="false" />
         </LinearLayout>

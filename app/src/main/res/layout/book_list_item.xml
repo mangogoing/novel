@@ -9,14 +9,15 @@
     <LinearLayout
         android:id="@+id/ll_item"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/activity_item_hight"
+        android:layout_height="wrap_content"
         android:orientation="vertical" >
 
         <TextView
             android:id="@+id/tv_item_name"
             android:layout_width="fill_parent"
-            android:layout_height="34dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="right"
+            android:singleLine="true"
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:paddingLeft="17dp"
@@ -28,14 +29,15 @@
         <TextView
             android:id="@+id/tv_item_statistic"
             android:layout_width="fill_parent"
-            android:layout_height="25dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="right"
+            android:singleLine="true"
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:paddingLeft="17dp"
             android:text="在追"
             android:textColor="@android:color/white"
-            android:textSize="15sp" >
+            android:textSize="18.5sp" >
         </TextView>
 
         <LinearLayout

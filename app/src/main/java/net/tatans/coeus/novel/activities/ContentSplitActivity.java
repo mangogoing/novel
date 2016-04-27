@@ -86,7 +86,7 @@ public class ContentSplitActivity extends BaseActivity {
     protected int countPage;
     public static int sentenceIndex = -1;// 句子的下标
     private boolean isFirstTouch = true;
-
+    private boolean isPreOrNext ;
     public void setsResult(String sResult) {
         this.sResult = sResult;
     }
@@ -294,6 +294,10 @@ public class ContentSplitActivity extends BaseActivity {
         if (mHomeWatcher != null) {
             mHomeWatcher.startWatch();
         }
+        if (speaker == null) {
+            speaker = net.tatans.coeus.speaker.Speaker
+                    .getInstance(ContentSplitActivity.this);
+        }
     }
 
     private boolean isHourly;
@@ -313,7 +317,7 @@ public class ContentSplitActivity extends BaseActivity {
                             ContentSplitActivity.this).pause();
                     Log.d("radio", "onFocusLossTransient---PAUSE");
                     isHourly = true;
-                    if(speaker!=null){
+                    if (speaker != null) {
                         speaker.pause();
                     }
                 }
@@ -327,7 +331,7 @@ public class ContentSplitActivity extends BaseActivity {
                         ContentSplitActivity.this).isSpeaking()) {
                     net.tatans.coeus.speaker.Speaker.getInstance(
                             ContentSplitActivity.this).pause();
-                    if(speaker!=null){
+                    if (speaker != null) {
                         speaker.pause();
                     }
                 }
@@ -341,7 +345,7 @@ public class ContentSplitActivity extends BaseActivity {
                         ContentSplitActivity.this).isSpeaking()) {
                     net.tatans.coeus.speaker.Speaker.getInstance(
                             ContentSplitActivity.this).pause();
-                    if(speaker!=null){
+                    if (speaker != null) {
                         speaker.pause();
                     }
                 }
@@ -358,7 +362,7 @@ public class ContentSplitActivity extends BaseActivity {
 //                    sentenceIndex--;
                     readNextSentence();
                 } else {
-                    if(speaker!=null){
+                    if (speaker != null) {
                         speaker.resume();
                     }
 
@@ -416,9 +420,9 @@ public class ContentSplitActivity extends BaseActivity {
     private void rightHandler() {
         Log.e("SentenceSplitActivity", "mDetector 向右:");
         PrePage();
-        if(speaker!=null){
+        if (speaker != null) {
             speaker.stop();
-        }else{
+        } else {
             speaker = net.tatans.coeus.speaker.Speaker
                     .getInstance(ContentSplitActivity.this);
         }
@@ -455,9 +459,9 @@ public class ContentSplitActivity extends BaseActivity {
         Log.e("SentenceSplitActivity", "mDetector 向左:");
         nextPage();
         // isStops = true;
-        if(speaker!=null){
+        if (speaker != null) {
             speaker.stop();
-        }else{
+        } else {
             speaker = net.tatans.coeus.speaker.Speaker
                     .getInstance(ContentSplitActivity.this);
         }
@@ -472,7 +476,7 @@ public class ContentSplitActivity extends BaseActivity {
 
                 @Override
                 public void onDone() {
-                    if(speaker!=null){
+                    if (speaker != null) {
                         speaker.resume();
                     }
                     String[] nextSplit = adapter.reString().toString()
@@ -492,8 +496,6 @@ public class ContentSplitActivity extends BaseActivity {
                 }
             });
         } else if (flag == 1) {// 下一条
-            pause_or_play.setText("暂停");
-            pause_or_play.setContentDescription("暂停。按钮");
             isComplete = false;
             nextInformation();
         }
@@ -631,8 +633,12 @@ public class ContentSplitActivity extends BaseActivity {
      * 读取下一句话
      */
     public void readNextSentence() {
-        if (speaker == null) {
+        if (speaker == null&&!isPreOrNext) {
+            isPreOrNext = false;
             return;
+        }else{
+            speaker = net.tatans.coeus.speaker.Speaker
+                    .getInstance(ContentSplitActivity.this);
         }
         if (sResult != null) {
             sentenceIndex++;
@@ -662,6 +668,8 @@ public class ContentSplitActivity extends BaseActivity {
                 // loadPage(position);
                 // mEditText.getText().toString().equals(split[sentenceIndex]);
                 speaker.speech(split[sentenceIndex]);
+                pause_or_play.setText("暂停");
+                pause_or_play.setContentDescription("暂停。按钮");
                 isSpeaking = true;
                 Log.d("PPPPPPPP", countPage + "");
                 // 如果当前正在读的内容不再当前页，则跳到下一页
@@ -706,7 +714,7 @@ public class ContentSplitActivity extends BaseActivity {
      */
     public void preInformation() {
         Log.d(TAG, "上一章");
-
+        isPreOrNext = true;
         speakPauseNoTips();
         isComplete = false;
     }
@@ -716,6 +724,7 @@ public class ContentSplitActivity extends BaseActivity {
      */
     public void nextInformation() {
         Log.d(TAG, "下一章");
+        isPreOrNext = true;
         speakPauseNoTips();
         isComplete = false;
     }
@@ -730,6 +739,9 @@ public class ContentSplitActivity extends BaseActivity {
         super.onPause();
         if (mHomeWatcher != null) {
             mHomeWatcher.stopWatch();
+        }
+        if (speaker == null) {
+
         }
     }
 
