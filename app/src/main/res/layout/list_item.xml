@@ -33,7 +33,8 @@
             android:layout_height="59dp"
             android:layout_gravity="right"
             android:gravity="center_vertical"
-               android:ellipsize="end"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:paddingLeft="17dp"
             android:textColor="@android:color/white"
             android:textSize="25sp" >
