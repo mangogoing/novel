@@ -102,8 +102,8 @@ public class ContentSplitActivity extends BaseActivity {
         appSpeaker = Speaker.getInstance(this);
         speaker = net.tatans.coeus.speaker.Speaker
                 .getInstance(ContentSplitActivity.this);
-        initView();
         initListener();
+        initView();
         initAudio();
         Intent intent = getIntent();
         isDownLoad = intent.getIntExtra("isDownLoad", -1);
@@ -260,12 +260,23 @@ public class ContentSplitActivity extends BaseActivity {
 
             @Override
             public void onHomePressed() {
-                speakPause();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        speakPause();
+                    }
+                },500);
+
             }
 
             @Override
             public void onHomeLongPressed() {
-                speakPause();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        speakPause();
+                    }
+                },500);
             }
         });
         listener = new onSpeechCompletionListener() {
