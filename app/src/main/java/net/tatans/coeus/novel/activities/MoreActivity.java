@@ -20,7 +20,7 @@ import net.tatans.coeus.novel.constant.AppConstants;
 import net.tatans.coeus.novel.dto.CollectorDto;
 import net.tatans.coeus.novel.services.DownLoadService;
 import net.tatans.coeus.novel.tools.InputMethodlUtil;
-import net.tatans.coeus.speech.util.NetWorkUtil;
+import net.tatans.coeus.novel.tools.NetworkUtils;
 
 import java.util.Date;
 
@@ -146,7 +146,7 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
                 download(collerctor);
                 break;
             case R.id.ll_replace_resource:
-                if (!NetWorkUtil.hasNetworkConnection(MoreActivity.this)) {
+                if (!NetworkUtils.isNetworkConnected(MoreActivity.this)) {
                     TatansToast.showAndCancel("当前网络未连接，请检查网络。");
                     return;
                 }
@@ -263,11 +263,11 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
         TatansToast.showAndCancel(text);
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        TatansToast.cancel();
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        TatansToast.cancel();
+//    }
 
     private void download(CollectorDto collerctor) {
         Log.e("TTTTTTTT", "--------" + BookBriefActivity.isWorked(getApplicationContext()));

@@ -12,7 +12,6 @@ import com.umeng.analytics.MobclickAgent;
 
 import net.tatans.coeus.novel.R;
 import net.tatans.coeus.novel.base.BaseActivity;
-import net.tatans.coeus.speaker.Speaker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,6 @@ public class ThemeMainActivity extends BaseActivity implements
 	private List<String> mainList;
 	private ListView lv_main;
 	private ArrayAdapter<String> listAdapter;
-	private Speaker speaker;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -30,7 +28,6 @@ public class ThemeMainActivity extends BaseActivity implements
 
 		setContentView(R.layout.theme_main);
 		lv_main = (ListView) findViewById(R.id.lv_novel_mian);
-		speaker = Speaker.getInstance(getApplicationContext());
 		setTitle("主题");
 
 		mainList = new ArrayList<String>();

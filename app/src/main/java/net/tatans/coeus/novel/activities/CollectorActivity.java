@@ -331,11 +331,11 @@ public class CollectorActivity extends BaseActivity {
         unRegisterMyReceiver(this);
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        TatansToast.cancel();
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        TatansToast.cancel();
+//    }
 
     // 得到需要刷新item的位置
     private int getPostionByID(String novel_id) {

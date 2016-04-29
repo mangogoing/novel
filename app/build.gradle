@@ -15,6 +15,7 @@ android {
         }
     }
 
+
     defaultConfig {
         manifestPlaceholders = [APP_NAME: AppName]
         applicationId "net.tatans.coeus.novel"
@@ -22,6 +23,7 @@ android {
         targetSdkVersion 22
         versionCode version_code.toInteger()
         versionName "1.2." + version_code
+        multiDexEnabled true
     }
 
     signingConfigs {
@@ -97,13 +99,12 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:support-v4:22.2.1'
     compile 'com.android.support:appcompat-v7:22.2.1'
-    compile 'net.tatans.coeus:coeus-network:5.0.0-release'
     compile 'net.tatans.coeus:coeus-audio:1.0.0-release'
     compile 'com.mcxiaoke.volley:library:1.0.18'
-    compile 'net.tatans.coeus:coeus-speech-lib:1.1.0-SNAPSHOT'
     compile 'com.belerweb:pinyin4j:2.5.0'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'com.umeng.analytics:analytics:latest.integration'
+    compile 'net.tatans.coeus:coeus-network:5.4.0-SNAPSHOT'
     debugCompile 'net.tatans.coeus:coeus-searchOOM:1.0.0-SNAPSHOT'
     releaseCompile 'net.tatans.coeus:coeus-searchOOM-no:1.0.0-SNAPSHOT'
 }

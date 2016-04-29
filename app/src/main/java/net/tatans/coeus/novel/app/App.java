@@ -5,11 +5,9 @@ import android.content.IntentFilter;
 import net.tatans.coeus.network.tools.TatansApplication;
 import net.tatans.coeus.network.tools.TatansDb;
 import net.tatans.coeus.novel.tools.UrlUtil;
-import net.tatans.coeus.util.Speaker;
 
 public class App extends TatansApplication {
 	private static App instance = null;
-	private static Speaker speaker;
 	public TatansDb db;
 
 	// MyDownLoadProgressReciver progressReciver ;
@@ -29,8 +27,8 @@ public class App extends TatansApplication {
 		 * db = TatansDb.create(this, "MyCollector"); if(progressReciver==null){
 		 * progressReciver=new MyDownLoadProgressReciver(); }
 		 */
-		speaker = Speaker.getInstance(getApplicationContext());
 		IntentFilter filter = new IntentFilter(UrlUtil.FINISH_ACTION);
+		setAppSpeaker();
 		// this.registerReceiver(progressReciver, filter);
 	}
 

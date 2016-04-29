@@ -20,7 +20,6 @@ import net.tatans.coeus.novel.base.BaseActivity;
 import net.tatans.coeus.novel.constant.AppConstants;
 import net.tatans.coeus.novel.dto.RankListDto;
 import net.tatans.coeus.novel.tools.UrlUtil;
-import net.tatans.coeus.speaker.Speaker;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +41,6 @@ public class RankListActivity extends BaseActivity {
 	String sRequest;
 	String id;
 	RankListAdapter adapter;
-	private Speaker speaker;
 	private int pageCount;
 	private int currentPage = 1;
 	Handler handler = new Handler();

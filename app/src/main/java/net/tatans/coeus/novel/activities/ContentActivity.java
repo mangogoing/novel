@@ -22,6 +22,7 @@ import com.android.volley.toolbox.Volley;
 import com.ushaqi.zhuishushenqi.util.CipherUtil;
 
 import net.tatans.coeus.network.callback.HttpRequestCallBack;
+import net.tatans.coeus.network.tools.TatansApplication;
 import net.tatans.coeus.network.tools.TatansDb;
 import net.tatans.coeus.network.tools.TatansHttp;
 import net.tatans.coeus.network.util.HttpProces;
@@ -574,11 +575,6 @@ public class ContentActivity extends ContentSplitActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (speaker != null) {
-            speaker.stop();
-            speaker.setOnSpeechCompletionListener(null);
-            speaker = null;
-        }
 //		save();
     }
 
@@ -611,12 +607,7 @@ public class ContentActivity extends ContentSplitActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
-            if (speaker != null) {
-                speaker.stop();
-                speaker.setOnSpeechCompletionListener(null);
-                speaker = null;
-            }
-            mAudioManagerUtil.abandonAudioFocus();
+            TatansApplication.pause();
             if (hasCollectored() == false) {
                 prompt();
             } else {

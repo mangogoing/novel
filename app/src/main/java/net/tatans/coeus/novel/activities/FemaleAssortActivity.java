@@ -7,31 +7,35 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.accessibility.AccessibilityEvent;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.google.gson.Gson;
 
 import net.tatans.coeus.network.callback.HttpRequestCallBack;
 import net.tatans.coeus.network.tools.TatansHttp;
 import net.tatans.coeus.network.tools.TatansToast;
 import net.tatans.coeus.novel.R;
+import net.tatans.coeus.novel.adapter.RankAdapter;
 import net.tatans.coeus.novel.adapter.TitleAdapter;
 import net.tatans.coeus.novel.base.BaseActivity;
 import net.tatans.coeus.novel.constant.AppConstants;
 import net.tatans.coeus.novel.dto.AssortDto;
+import net.tatans.coeus.novel.dto.RankDto;
 import net.tatans.coeus.novel.tools.UrlUtil;
-import net.tatans.coeus.speaker.Speaker;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class FemaleAssortActivity extends BaseActivity implements
-		OnItemClickListener {
-	private List<String> oneList;
+		AdapterView.OnItemClickListener {
+	private List<String> oneList= new ArrayList<String>();;
 	private ListView lv_one_list;
 	private TextView tv_loading;
 	private TitleAdapter listAdapter;
@@ -39,13 +43,13 @@ public class FemaleAssortActivity extends BaseActivity implements
 	private int currentPage = 1;
 	List<AssortDto> ClassificatList = new ArrayList<AssortDto>();
 	Handler handler = new Handler();
-	private Speaker speaker;
 	private boolean isSpeak;
 	private boolean isFirstTouch = true;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.list);
+		setTitle("女生分类");
 		lv_one_list = (ListView) findViewById(R.id.lv_main);
 		tv_loading = (TextView) findViewById(R.id.tv_loading);
 		tv_loading.setOnHoverListener(new View.OnHoverListener() {
@@ -62,8 +66,6 @@ public class FemaleAssortActivity extends BaseActivity implements
 				return false;
 			}
 		});
-		setTitle("女生分类");
-		oneList = new ArrayList<String>();
 		new myAsycTesk().execute();
 		lv_one_list.setOnItemClickListener(this);
 
@@ -83,7 +85,7 @@ public class FemaleAssortActivity extends BaseActivity implements
 				@Override
 				public void onSuccess(String arg0) {
 					super.onSuccess(arg0);
-					lv_one_list.setVisibility(View.VISIBLE);
+
 					json2Gson(arg0);
 				}
 
@@ -161,6 +163,7 @@ public class FemaleAssortActivity extends BaseActivity implements
 		lv_one_list.setAdapter(listAdapter);
 //		lv_one_list.setAdapter(listAdapter);
 		tv_loading.setVisibility(View.GONE);
+		lv_one_list.setVisibility(View.VISIBLE);
 	}
 
 	/*@Override
@@ -238,34 +241,34 @@ public class FemaleAssortActivity extends BaseActivity implements
 
 	}
 
-	@Override
-	protected void onStop() {
-		super.onStop();
-		TatansToast.cancel();
-	}
+//	@Override
+//	protected void onStop() {
+//		super.onStop();
+//		TatansToast.cancel();
+//	}
 
 	@Override
 	public void left() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void right() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void up() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void down() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

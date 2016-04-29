@@ -30,12 +30,11 @@ import net.tatans.coeus.novel.constant.AppConstants;
 import net.tatans.coeus.novel.dto.ChapterDto;
 import net.tatans.coeus.novel.dto.CollectorDto;
 import net.tatans.coeus.novel.dto.SummaryDto;
-import net.tatans.coeus.novel.services.DownLoadService;
 import net.tatans.coeus.novel.tools.FilePathUtil;
 import net.tatans.coeus.novel.tools.FileUtil;
 import net.tatans.coeus.novel.tools.JsonUtils;
+import net.tatans.coeus.novel.tools.NetworkUtils;
 import net.tatans.coeus.novel.tools.UrlUtil;
-import net.tatans.coeus.speech.util.NetWorkUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -229,7 +228,7 @@ public class ReplaceResourceActivity extends BaseActivity implements
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position,
                             long id) {
-        if (!NetWorkUtil.hasNetworkConnection(ReplaceResourceActivity.this)) {
+        if (!NetworkUtils.isNetworkConnected(ReplaceResourceActivity.this)) {
             TatansToast.showAndCancel("当前网络未连接，请检查网络。");
             return;
         }

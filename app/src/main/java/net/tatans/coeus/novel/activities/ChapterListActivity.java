@@ -354,11 +354,11 @@ public class ChapterListActivity extends BaseActivity implements
 
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        TatansToast.cancel();
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        TatansToast.cancel();
+//    }
 
     @Override
     public void left() {

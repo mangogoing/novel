@@ -21,7 +21,6 @@ import net.tatans.coeus.novel.base.BaseActivity;
 import net.tatans.coeus.novel.constant.AppConstants;
 import net.tatans.coeus.novel.dto.RankDto;
 import net.tatans.coeus.novel.tools.UrlUtil;
-import net.tatans.coeus.util.Speaker;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,7 +40,6 @@ public class RankActivity extends BaseActivity {
     private TextView tv_loading;
     String sRequest;
     RankAdapter adapter;
-    private Speaker speaker;
     private int pageCount;
     private int currentPage = 1;
     Handler handler = new Handler();
@@ -51,7 +49,6 @@ public class RankActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        speaker = Speaker.getInstance(getApplicationContext());
         setContentView(R.layout.list);
         setTitle("排行榜");
         lv_main = (ListView) findViewById(R.id.lv_main);
@@ -198,6 +195,7 @@ public class RankActivity extends BaseActivity {
                 this.getApplicationContext(), (int) AppConstants.APP_PAGE_SIZE);
         lv_main.setAdapter(adapter);
         tv_loading.setVisibility(View.GONE);
+
     }
 
     //

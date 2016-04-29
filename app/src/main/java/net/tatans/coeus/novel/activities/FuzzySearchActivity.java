@@ -33,7 +33,6 @@ import net.tatans.coeus.novel.constant.AppConstants;
 import net.tatans.coeus.novel.dto.BookListDto;
 import net.tatans.coeus.novel.tools.InputMethodlUtil;
 import net.tatans.coeus.novel.tools.UrlUtil;
-import net.tatans.coeus.speaker.Speaker;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -54,7 +53,6 @@ public class FuzzySearchActivity extends BaseActivity implements
 	private List<BookListDto> ClassificatList = new ArrayList<BookListDto>();
 	private Handler handler = new Handler();
 	private Handler handlerSpeak = new Handler();
-	private Speaker speaker;
 	private EditText av_autotext;
 	private TextView tv_search;
 	private TextView tv_loading;
@@ -71,7 +69,6 @@ public class FuzzySearchActivity extends BaseActivity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.search_activity);
 		setTitle("搜索");
-		speaker = Speaker.getInstance(FuzzySearchActivity.this);
 		initView();
 //		emptyAdapter = new ArrayAdapter<String>(getApplication(),
 //				R.layout.list_item, R.id.tv_item_name, new ArrayList<String>());
@@ -551,11 +548,11 @@ public class FuzzySearchActivity extends BaseActivity implements
 		TatansToast.showAndCancel( text);
 	}
 
-	@Override
-	protected void onStop() {
-		super.onStop();
-		TatansToast.cancel();
-	}
+//	@Override
+//	protected void onStop() {
+//		super.onStop();
+//		TatansToast.cancel();
+//	}
 
 	@Override
 	protected void onPause() {

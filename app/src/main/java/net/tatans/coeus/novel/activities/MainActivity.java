@@ -17,7 +17,7 @@ import net.tatans.coeus.network.tools.TatansToast;
 import net.tatans.coeus.novel.R;
 import net.tatans.coeus.novel.adapter.MainAdapter;
 import net.tatans.coeus.novel.base.BaseActivity;
-import net.tatans.coeus.speech.util.NetWorkUtil;
+import net.tatans.coeus.novel.tools.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,7 +92,7 @@ public class MainActivity extends BaseActivity implements OnItemClickListener {
 					CollectorActivity.class);
 			startActivity(intent);
 		} else {
-			if (!NetWorkUtil.hasNetworkConnection(MainActivity.this)) {
+			if (!NetworkUtils.isNetworkConnected(MainActivity.this)) {
 				TatansToast.showAndCancel("当前网络未连接，请检查网络。");
 				return;
 			}

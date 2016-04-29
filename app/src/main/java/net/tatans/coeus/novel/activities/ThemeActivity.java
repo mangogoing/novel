@@ -20,7 +20,6 @@ import net.tatans.coeus.novel.base.BaseActivity;
 import net.tatans.coeus.novel.constant.AppConstants;
 import net.tatans.coeus.novel.dto.ThemeDto;
 import net.tatans.coeus.novel.tools.UrlUtil;
-import net.tatans.coeus.speaker.Speaker;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,7 +40,6 @@ public class ThemeActivity extends BaseActivity {
 	private TextView tv_loading;
 	int start = 0;
 	ThemeAdapter adapter;
-	private Speaker speaker;
 	private int pageCount;
 	private int currentPage = 1;
 	Handler handler = new Handler();

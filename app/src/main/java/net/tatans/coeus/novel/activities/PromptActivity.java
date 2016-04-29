@@ -102,11 +102,11 @@ public class PromptActivity extends BaseActivity implements OnClickListener {
 
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        TatansToast.cancel();
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        TatansToast.cancel();
+//    }
 
     @Override
     public void left() {

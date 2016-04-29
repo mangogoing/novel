@@ -395,11 +395,11 @@ public class BookBriefActivity extends BaseActivity implements
     // setTitle("书籍" + title);
     // }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        TatansToast.cancel();
-    }
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        TatansToast.cancel();
+//    }
 
     @Override
     protected void onDestroy() {
