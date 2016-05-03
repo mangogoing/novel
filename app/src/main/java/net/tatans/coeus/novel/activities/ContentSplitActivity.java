@@ -526,19 +526,15 @@ public class ContentSplitActivity extends BaseActivity {
                     @Override
                     public void onCompleted() {
                         super.onCompleted();
-//                        if (sentenceIndex >= split.length) {
-//                            TatansApplication.speech("", null);
-//                        } else {
                         readNextSentence();
                     }
                 });
                 isSpeaking = true;
+                pause_or_play.setText("暂停");
+                pause_or_play.setContentDescription("暂停。按钮");
                 Log.d("PPPPPPPP", countPage + "");
-                // 如果当前正在读的内容不再当前页，则跳到下一页
-//                Log.d("QQQQQQQQ", adapter.reString().toString());
                 String str = adapter.reString().toString();
                 if (!str.equals("") && !str.contains(split[sentenceIndex])) {
-//                    Log.d("QQQQQQQQ", "nextPage");
                     nextPage();
                 }
             }
