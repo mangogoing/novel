@@ -51,7 +51,7 @@ public class ContentSplitActivity extends BaseActivity {
     protected TextView next, pre, pause_or_play;
     private String sResult;
     private String[] split;
-    private boolean isSpeaking;
+    private boolean isSpeaking ;
     private Map<String, Integer> map = new HashMap<String, Integer>();
     private static Map<Integer, Integer> page = new HashMap<Integer, Integer>();
     // private int countPage = 0;// 用于保存上一页的position
@@ -115,9 +115,9 @@ public class ContentSplitActivity extends BaseActivity {
 
     @Override
     public void up() {
-        if ("暂停".equals(pause_or_play.getText().toString())) {
+        if ("暂停".equals(pause_or_play.getText().toString())&&isSpeaking) {
             speakPause();
-        } else {
+        } else if ("播放".equals(pause_or_play.getText().toString())){
             speakResume();
         }
     }
@@ -178,9 +178,9 @@ public class ContentSplitActivity extends BaseActivity {
         pause_or_play.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if ("暂停".equals(pause_or_play.getText().toString()) && isSpeaking) {
+                if ("暂停".equals(pause_or_play.getText().toString())&&isSpeaking) {
                     speakPause();
-                } else if ("播放".equals(pause_or_play.getText().toString()) && !isSpeaking) {
+                } else if ("播放".equals(pause_or_play.getText().toString())){
                     speakResume();
                 }
             }
