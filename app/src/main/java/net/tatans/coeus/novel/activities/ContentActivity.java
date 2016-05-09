@@ -33,6 +33,7 @@ import net.tatans.coeus.novel.dto.SummaryDto;
 import net.tatans.coeus.novel.tools.FilePathUtil;
 import net.tatans.coeus.novel.tools.FileUtil;
 import net.tatans.coeus.novel.tools.JsonUtils;
+import net.tatans.coeus.novel.tools.JudgeGarbledUtil;
 import net.tatans.coeus.novel.tools.UrlUtil;
 
 import org.json.JSONObject;
@@ -84,6 +85,23 @@ public class ContentActivity extends ContentSplitActivity {
             source = "0";
         }
         sourceNum = Integer.parseInt(source);
+        if (sourceNum == -1) {
+            filePath = FilePathUtil.getFilePath(bookId, -2, sourceNum);
+            try {
+                StringBuffer sb = FileUtil.read(filePath);
+                String result = sb.toString();
+                result = result.replace("\r\n","");
+                totalChapterCount = Integer.parseInt(result);
+                filePath = FilePathUtil.getFilePath(bookId, currentPosition, sourceNum);
+                new readFromSDcard().execute();
+
+            } catch (Exception e) {
+                setContent(title+"文件出错，无法阅读,试试重命名该小说，并刪除重新导入。");
+                e.printStackTrace();
+            }
+
+            return;
+        }
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -403,14 +421,14 @@ public class ContentActivity extends ContentSplitActivity {
                 result = FileUtil.read(filePath).toString();
             } catch (IOException e) {
                 e.printStackTrace();
-                setContent("小说内容出错，建议换源重新下载该资源");
+                setContent(title+"小说内容出错，建议换源重新下载该资源");
                 return;
             }
             json3Gson(result);
             if (!strContent.equals("")) {
                 setContent(strContent);
             } else {
-                setContent("小说内容出错，建议换源重新下载该资源");
+                setContent(title+"小说内容出错，建议换源重新下载该资源");
             }
         }
 
@@ -437,9 +455,10 @@ public class ContentActivity extends ContentSplitActivity {
             }
 
         } else {
+            JudgeGarbledUtil.isMessyCode(result);
             String mResult = result.replace(" ", "");
-            String mmResult = mResult.replace("\n", "");
-            strContent = mmResult;
+            mResult = mResult.replace("\r\n", "");
+            strContent =  (currentPosition + 1)+"。"+mResult;
         }
 
         if (isCollector) {
@@ -478,7 +497,7 @@ public class ContentActivity extends ContentSplitActivity {
             playPlayback();
             int nextPosition = currentPosition + 1;
             String path = FilePathUtil.getFilePath(bookId, nextPosition, sourceNum);
-            if (!FileUtil.fileIsExists(path)) {
+            if (!FileUtil.fileIsExists(path) && chapterList != null) {
                 if (nextPosition < (chapterList.size() - 1)) {
                     getContentResource(chapterList.get(nextPosition).getLink(), nextPosition, false);
                 }

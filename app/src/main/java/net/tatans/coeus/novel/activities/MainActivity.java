@@ -47,6 +47,7 @@ public class MainActivity extends BaseActivity implements OnItemClickListener {
 		mainList.add("最多收藏主题");
 		mainList.add("男生分类");
 		mainList.add("女生分类");
+		mainList.add("本地小说");
 //		listAdapter = new ArrayAdapter<String>(getApplication(),
 //				R.layout.list_item, R.id.tv_item_name, mainList);
 		listAdapter = new MainAdapter(getApplicationContext(), mainList);
@@ -149,7 +150,11 @@ public class MainActivity extends BaseActivity implements OnItemClickListener {
 				intent.setClass(MainActivity.this, FemaleAssortActivity.class);
 				startActivity(intent);
 				break;
-
+				case 8:
+					intent = new Intent();
+					intent.setClass(MainActivity.this, LocalFileActivity.class);
+					startActivity(intent);
+					break;
 			}
 
 		}

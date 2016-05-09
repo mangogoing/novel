@@ -137,6 +137,14 @@
             </intent-filter>
         </receiver>
 
+        <receiver
+            android:name="net.tatans.coeus.novel.broadCastRecivers.LoadFileReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="net.tatans.coeus.novel.loadfile" />
+            </intent-filter>
+        </receiver>
+
         <!--
    		         桌面手势广播接受器
         <receiver

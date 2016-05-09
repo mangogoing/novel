@@ -109,7 +109,11 @@ public class ChapterListActivity extends BaseActivity implements
             source = "0";
         }
         sourceNum = Integer.parseInt(source);
-
+        if (sourceNum == -1) {
+            chapterFilePath = FilePathUtil.getFilePath(bookId, -1, sourceNum);
+            json2Gson("");
+            return;
+        }
 //        init();
         new readSummaryListFromSDcard().execute();
 

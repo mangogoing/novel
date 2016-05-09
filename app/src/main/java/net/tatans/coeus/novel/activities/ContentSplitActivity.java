@@ -51,7 +51,7 @@ public class ContentSplitActivity extends BaseActivity {
     protected TextView next, pre, pause_or_play;
     private String sResult;
     private String[] split;
-    private boolean isSpeaking ;
+    private boolean isSpeaking;
     private Map<String, Integer> map = new HashMap<String, Integer>();
     private static Map<Integer, Integer> page = new HashMap<Integer, Integer>();
     // private int countPage = 0;// 用于保存上一页的position
@@ -115,9 +115,9 @@ public class ContentSplitActivity extends BaseActivity {
 
     @Override
     public void up() {
-        if ("暂停".equals(pause_or_play.getText().toString())&&isSpeaking) {
+        if ("暂停".equals(pause_or_play.getText().toString()) && isSpeaking) {
             speakPause();
-        } else if ("播放".equals(pause_or_play.getText().toString())){
+        } else if ("播放".equals(pause_or_play.getText().toString())) {
             speakResume();
         }
     }
@@ -178,9 +178,9 @@ public class ContentSplitActivity extends BaseActivity {
         pause_or_play.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if ("暂停".equals(pause_or_play.getText().toString())&&isSpeaking) {
+                if ("暂停".equals(pause_or_play.getText().toString()) && isSpeaking) {
                     speakPause();
-                } else if ("播放".equals(pause_or_play.getText().toString())){
+                } else if ("播放".equals(pause_or_play.getText().toString())) {
                     speakResume();
                 }
             }
@@ -521,22 +521,29 @@ public class ContentSplitActivity extends BaseActivity {
                         sentenceIndex++;
                     }
                 }
-                Log.d("OOOOOPPPPPP", split[1]);
-                TatansApplication.speech(split[sentenceIndex], new TatansSpeakerCallback() {
-                    @Override
-                    public void onCompleted() {
-                        super.onCompleted();
-                        readNextSentence();
+                try {
+                    Log.d("OOOOOPPPPPP", split[1]);
+                    TatansApplication.speech(split[sentenceIndex], new TatansSpeakerCallback() {
+                        @Override
+                        public void onCompleted() {
+                            super.onCompleted();
+                            readNextSentence();
+                        }
+                    });
+                    isSpeaking = true;
+                    pause_or_play.setText("暂停");
+                    pause_or_play.setContentDescription("暂停。按钮");
+                    Log.d("PPPPPPPP", countPage + "");
+                    String str = adapter.reString().toString();
+                    if (!str.equals("") && !str.contains(split[sentenceIndex])) {
+                        nextPage();
                     }
-                });
-                isSpeaking = true;
-                pause_or_play.setText("暂停");
-                pause_or_play.setContentDescription("暂停。按钮");
-                Log.d("PPPPPPPP", countPage + "");
-                String str = adapter.reString().toString();
-                if (!str.equals("") && !str.contains(split[sentenceIndex])) {
-                    nextPage();
+                } catch (Exception e) {
+                    sentenceIndex = -1;
+                    setContent("文件内容错误，无法阅读");
+                    e.printStackTrace();
                 }
+
             }
 
         } else {

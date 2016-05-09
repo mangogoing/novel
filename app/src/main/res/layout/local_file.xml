@@ -4,24 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <ListView
         android:id="@+id/lv_local_file"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="8"
-        android:focusable="true" >
-    </ListView>
+        android:layout_height="wrap_content"
+        android:focusable="true"></ListView>
 
     <TextView
         android:id="@+id/fileText"
         android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:gravity="center"
         android:textColor="#219ac6"
-        android:visibility="gone"
-        android:textSize="20px" />
+        android:textSize="25sp"
+        android:visibility="gone" />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:focusable="true"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="25sp" />
+
 
 </LinearLayout>

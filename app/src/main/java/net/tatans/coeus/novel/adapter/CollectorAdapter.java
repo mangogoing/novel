@@ -131,7 +131,7 @@ public class CollectorAdapter extends BaseAdapter {
                     String Tag = ": " + (double) convertView.getTag() + "%已缓存";
                     text = text + Tag;
                 }
-                imageView.setContentDescription("取消緩存" + title );
+                imageView.setContentDescription("取消緩存" + title);
                 status.setImageResource(R.drawable.down_loading);
                 status.setContentDescription("下载中");
             } else if (collcetor.getIsDownLoad() == 2) {
@@ -145,7 +145,16 @@ public class CollectorAdapter extends BaseAdapter {
                 status.setImageResource(R.drawable.down_loaded);
                 status.setContentDescription("已下载");
             } else if (collcetor.getIsDownLoad() == 3) {
-                imageView.setContentDescription("移除小说" + title );
+                if (convertView.getTag(R.id.currentChapter) != null) {
+                    int currentChapter = (int) convertView.getTag(R.id.currentChapter);
+                    String Tag = ": 已导入" + currentChapter + "章";
+                    if ((boolean) convertView.getTag(R.id.isEnd)) {
+                         Tag = ": 导入完成";
+                    }
+                    text = text + Tag;
+                }
+
+                imageView.setContentDescription("移除小说" + title);
                 status.setImageResource(R.drawable.local_file);
                 status.setContentDescription("本地小说");
             } else {
@@ -190,7 +199,7 @@ public class CollectorAdapter extends BaseAdapter {
                         }
                         new Thread(new Runnable() {
                             public void run() {
-                        FileUtil.delete(file);
+                                FileUtil.delete(file);
                             }
                         }).start();
 

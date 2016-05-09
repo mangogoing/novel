@@ -143,7 +143,11 @@ public class MoreActivity extends BaseActivity implements OnClickListener {
                 break;
             case R.id.ll_cache:
                 // 打开service下载下一个等待缓存的
-                download(collerctor);
+                if (isDownLoad != 3) {
+                    download(collerctor);
+                } else {
+                    showToast("本地小说不支持缓存");
+                }
                 break;
             case R.id.ll_replace_resource:
                 if (!NetworkUtils.isNetworkConnected(MoreActivity.this)) {

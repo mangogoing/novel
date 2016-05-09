@@ -12,7 +12,7 @@
         <ImageView
             android:id="@+id/icon"
             android:layout_width="55dp"
-            android:layout_height="80dp"
+            android:layout_height="55dp"
             android:layout_margin="5dp" >
         </ImageView>
 
@@ -22,7 +22,7 @@
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:textColor="@color/white"
-            android:textSize="20dp" >
+            android:textSize="25dp" >
         </TextView>
     </LinearLayout>
 

@@ -79,7 +79,7 @@ public class CollectorActivity extends BaseActivity {
             public boolean onHover(View v, MotionEvent event) {
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_HOVER_ENTER:
-                        if(!isFirstTouch){
+                        if (!isFirstTouch) {
                             showToast(getString(R.string.loading_hint));
                         }
                         isFirstTouch = false;
@@ -294,15 +294,17 @@ public class CollectorActivity extends BaseActivity {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(UrlUtil.ACTION)) {
                 Bundle bundle = intent.getExtras();
-                final double percent = bundle.getDouble("percent");
+                final double percent = bundle.getDouble("percent",0);
                 String bookId = bundle.getString("bookId");
+                int currentChapter = bundle.getInt("currentChapter", 0);
+                boolean isEnd = bundle.getBoolean("isEnd",false);
                 final int position = getPostionByID(bookId);
                 if (position == -1
                         || !NetworkUtils
                         .isNetworkConnected(getApplicationContext())) {
                     return;
                 } else {
-                    updateSingleRow(position, percent);
+                    updateSingleRow(position, percent, currentChapter,isEnd);
                 }
             }
         }
@@ -353,7 +355,7 @@ public class CollectorActivity extends BaseActivity {
      * @param postion
      * @param percent
      */
-    public void updateSingleRow(final int postion, final double percent) {
+    public void updateSingleRow(final int postion, final double percent, final int currentChapter, final boolean isEnd) {
 
         lv_main.post(new Runnable() {
             public void run() {
@@ -362,6 +364,8 @@ public class CollectorActivity extends BaseActivity {
                 if (postion >= start && postion <= Last) {
                     View view = lv_main.getChildAt(postion - start);
                     view.setTag(percent);
+                    view.setTag(R.id.currentChapter, currentChapter);
+                    view.setTag(R.id.isEnd, isEnd);
                     adapter.getView(postion, view, lv_main);
                 }
             }
